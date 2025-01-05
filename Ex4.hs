@@ -22,7 +22,13 @@ hyloExpr h g = cataExpr h . anaExpr g
 
 --4.2
 
---instance Monad (Expr b) where
+instance Monad (Expr b) where
+    return  = V
+    (V a) >>= g = g a
+    (N b) >>= g = N b
+    (T op l) >>= g = T op (map (`>>=` g) l)
+
+-- NÃO SEI SE ESTÁ CERTO !!!
 
 --4.3
 
