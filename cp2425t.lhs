@@ -563,10 +563,113 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{code}
-hindex = undefined
+hindex = hyloList f g
+
+g [] = i1()
+g xs = (i2 . split p1 (uncurry delete) . split minimum id) xs
+
+f = either (const (0,[])) 
+           (cond (uncurry (>=) . (id >< succ . p1)) 
+                 (split (succ . p1 . p2) (conc . swap . (singl >< p2))) 
+                 p2)
 \end{code}
+
+\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista representando o histograma. O cálculo baseia-se nas seguintes funções:
+
+\begin{itemize}
+    \item \texttt{g}: Uma função anamórfica que decompõe o histograma em subestruturas, identificando a barra com a menor altura e preparando os dados para processamento.
+    \item \texttt{f}: Uma função catamórfica que processa a estrutura gerada por \texttt{g} para calcular o H-index e identificar as barras que contribuem para o resultado.
+\end{itemize}
+
+\noindent O uso de \emph{combinadores} como \texttt{hyloList}, \texttt{split}, e \texttt{cond} torna a solução elegante e composicional, refletindo a abordagem funcional desta disciplina.
+
+\[
+\xymatrix@@C=2cm{
+    |Int*| \ar[r]^{|g|} \ar[d]_-{|anaList g|}
+  & |1 + (Int >< (Int*))| \ar[d]^{|id + id >< (anaList g)|} \\
+    |Int*| \ar[r]^{|out|} \ar[d]_-{|cataNat f|}
+  & |Either 1 (Int >< Int*)| \ar[d]^{|Either id (id >< cataNat f)|} \\
+    |Int >< Int*| 
+  & |Either 1 (Int >< (Int >< Int*))| \ar[l]^-{|f|}
+}
+\]
+
+\subsubsection*{Exemplo de execução do algoritmo que desenvolvemos}
+
+Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4, 9]}:
+
+\begin{itemize}
+    \item \texttt{n}: o menor elemento da lista atual (fornecido por \texttt{g}).
+    \item \texttt{k}: o índice acumulado até o momento.
+    \item \texttt{xs}: a lista restante após remover o menor elemento.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Primeira iteração}:
+    \begin{align*}
+        g([5, 2, 7, 1, 8, 6, 4, 9]) &= \texttt{Right (1, [5, 2, 7, 8, 6, 4, 9])} \\
+        f(1, 0, [5, 2, 7, 8, 6, 4, 9]) &= (1, [5, 2, 7, 8, 6, 4, 9])
+    \end{align*}
+    Aqui, \texttt{n = 1}, \texttt{k = 0}, e \texttt{xs = [5, 2, 7, 8, 6, 4, 9]}. A condição verificada é:
+    \[
+    1 \geq 0 + 1 \quad \text{(verdadeiro)}
+    \]
+
+    \item \textbf{Segunda iteração}:
+    \begin{align*}
+        g([5, 2, 7, 8, 6, 4, 9]) &= \texttt{Right (2, [5, 7, 8, 6, 4, 9])} \\
+        f(2, 1, [5, 7, 8, 6, 4, 9]) &= (2, [5, 7, 8, 6, 4, 9])
+    \end{align*}
+    Aqui, \texttt{n = 2}, \texttt{k = 1}, e \texttt{xs = [5, 7, 8, 6, 4, 9]}. A condição verificada é:
+    \[
+    2 \geq 1 + 1 \quad \text{(verdadeiro)}
+    \]
+
+    \item \textbf{Terceira iteração}:
+    \begin{align*}
+        g([5, 7, 8, 6, 4, 9]) &= \texttt{Right (4, [5, 7, 8, 6, 9])} \\
+        f(4, 2, [5, 7, 8, 6, 9]) &= (3, [5, 7, 8, 6, 9])
+    \end{align*}
+    Aqui, \texttt{n = 4}, \texttt{k = 2}, e \texttt{xs = [5, 7, 8, 6, 9]}. A condição verificada é:
+    \[
+    4 \geq 2 + 1 \quad \text{(verdadeiro)}
+    \]
+
+    \item \textbf{Quarta iteração}:
+    \begin{align*}
+        g([5, 7, 8, 6, 9]) &= \texttt{Right (5, [7, 8, 6, 9])} \\
+        f(5, 3, [7, 8, 6, 9]) &= (4, [7, 8, 6, 9])
+    \end{align*}
+    Aqui, \texttt{n = 5}, \texttt{k = 3}, e \texttt{xs = [7, 8, 6, 9]}. A condição verificada é:
+    \[
+    5 \geq 3 + 1 \quad \text{(verdadeiro)}
+    \]
+
+    \item \textbf{Quinta iteração}:
+    \begin{align*}
+        g([7, 8, 6, 9]) &= \texttt{Right (6, [7, 8, 9])} \\
+        f(6, 4, [7, 8, 9]) &= (5, [7, 8, 9])
+    \end{align*}
+    Aqui, \texttt{n = 6}, \texttt{k = 4}, e \texttt{xs = [7, 8, 9]}. A condição verificada é:
+    \[
+    6 \geq 4 + 1 \quad \text{(verdadeiro)}
+    \]
+
+    \item \textbf{Sexta iteração (condição falha)}:
+    \begin{align*}
+        g([7, 8, 9]) &= \texttt{Right (7, [8, 9])} \\
+        f(7, 5, [8, 9]) &= (5, [8, 9])
+    \end{align*}
+    Aqui, \texttt{n = 7}, \texttt{k = 5}, e \texttt{xs = [8, 9]}. A condição verificada é:
+    \[
+    7 \geq 5 + 1 \quad \text{(falso, parar o cálculo)}
+    \]
+\end{itemize}
+
+\noindent O cálculo para na sexta iteração, pois a condição avaliada por \texttt{f} é falsa. O valor final do \textbf{H-index} é, portanto, \textbf{5}.
 
 \subsection*{Problema 2}
 Primeira parte:
