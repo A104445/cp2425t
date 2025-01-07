@@ -708,17 +708,19 @@ convolve = undefined
 \subsection*{Problema 4}
 Definição do tipo:
 \begin{code}
-outExpr = undefined
+outExpr(V a) = i1 a
+outExpr(N b) = (i2 . i1) b
+outExpr(T op l) = (i2 . i2) (op,l)
 
-recExpr = undefined
+recExpr = baseExpr id id
 \end{code}
 \emph{Ana + cata + hylo}:
 \begin{code}
-cataExpr g = undefined
+cataExpr g = g . (recExpr (cataExpr g)) . outExpr
 
-anaExpr g = undefined
-                
-hyloExpr h g = undefined
+anaExpr g = inExpr . (recExpr (anaExpr g)) . g
+
+hyloExpr h g = cataExpr h . anaExpr g
 \end{code}
 \emph{Maps}:
 \emph{Monad}:

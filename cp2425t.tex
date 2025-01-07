@@ -927,20 +927,24 @@ Definição do tipo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{outExpr}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{outExpr}\;(\Conid{V}\;\Varid{a})\mathrel{=}i_1\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{outExpr}\;(\Conid{N}\;\Varid{b})\mathrel{=}(i_2\comp i_1)\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{outExpr}\;(\Conid{T}\;\Varid{op}\;\Varid{l})\mathrel{=}(i_2\comp i_2)\;(\Varid{op},\Varid{l}){}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{recExpr}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{recExpr}\mathrel{=}\Varid{baseExpr}\;\Varid{id}\;\Varid{id}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \emph{Ana + cata + hylo}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{cataExpr}\;\Varid{g}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{cataExpr}\;\Varid{g}\mathrel{=}\Varid{g}\comp (\Varid{recExpr}\;(\Varid{cataExpr}\;\Varid{g}))\comp \Varid{outExpr}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{anaExpr}\;\Varid{g}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{anaExpr}\;\Varid{g}\mathrel{=}\Varid{inExpr}\comp (\Varid{recExpr}\;(\Varid{anaExpr}\;\Varid{g}))\comp \Varid{g}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \emph{Maps}:
