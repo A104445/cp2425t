@@ -722,6 +722,20 @@ anaExpr g = inExpr . (recExpr (anaExpr g)) . g
 
 hyloExpr h g = cataExpr h . anaExpr g
 \end{code}
+\emph{Monad}:
+\begin{code}
+instance Functor (Expr b) where
+     fmap f = cataExpr (inExpr . baseExpr f id id)
+instance Applicative (Expr b) where
+     (<*>) = aap
+     pure  = return
+instance Monad (Expr b) where
+    return  = V
+    --e >>= g = (cataExpr () . fmap g) e
+    (V a) >>= g = g a
+    (N b) >>= g = N b
+    (T op l) >>= g = T op (map (>>= g) l)
+\end{code}
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
@@ -730,7 +744,8 @@ let_exp = undefined
 \end{code}
 Catamorfismo monádico:
 \begin{code}
-mcataExpr g = undefined
+mcataExpr = undefined
+--mcataExpr g = inExpr . (recExpr (mcataExpr g)) . outExpr
 \end{code}
 Avaliação de expressões:
 \begin{code}

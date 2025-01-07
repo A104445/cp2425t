@@ -951,6 +951,47 @@ Definição do tipo:
 \>[B]{}\Varid{hyloExpr}\;\Varid{h}\;\Varid{g}\mathrel{=}\Varid{cataExpr}\;\Varid{h}\comp \Varid{anaExpr}\;\Varid{g}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+\emph{Monad}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{instance}\;\Conid{Functor}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\mathsf{fmap}\;\Varid{f}\mathrel{=}\Varid{cataExpr}\;(\Varid{inExpr}\comp \Varid{baseExpr}\;\Varid{f}\;\Varid{id}\;\Varid{id}){}\<[E]%
+\\
+\>[B]{}\mathbf{instance}\;\Conid{Applicative}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}(\mathbin{<*>})\mathrel{=}\Varid{aap}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{pure}{}\<[12]%
+\>[12]{}\mathrel{=}\Varid{return}{}\<[E]%
+\\
+\>[B]{}\mathbf{instance}\;\Conid{Monad}\;(\Conid{Expr}\;\Varid{b})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{return}{}\<[13]%
+\>[13]{}\mathrel{=}\Conid{V}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mbox{\onelinecomment e >>= g = (cataExpr () . fmap g) e}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}(\Conid{V}\;\Varid{a})\bind \Varid{g}\mathrel{=}\Varid{g}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}(\Conid{N}\;\Varid{b})\bind \Varid{g}\mathrel{=}\Conid{N}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}(\Conid{T}\;\Varid{op}\;\Varid{l})\bind \Varid{g}\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\bind \Varid{g})\;\Varid{l}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
@@ -964,7 +1005,9 @@ Catamorfismo monádico:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mcataExpr}\;\Varid{g}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{mcataExpr}\mathrel{=}\bot {}\<[E]%
+\\
+\>[B]{}\mbox{\onelinecomment mcataExpr g = inExpr . (recExpr (mcataExpr g)) . outExpr}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Avaliação de expressões:
