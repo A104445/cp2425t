@@ -676,18 +676,18 @@ Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4,
 \subsection*{Problema 2}
 Primeira parte:
 \begin{code}
-primes = anaList g
+primes = anaList fst_prime
 
-g 1 = i1()
-g n = (i2 . split p2 (uncurry div) .
-split id (head . ap .
-split (filter . ((==0) .) . mod) (conc .
-split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))) n
+fst_prime 1 = i1()
+fst_prime n = (i2 . split p2 (uncurry div) 
+     . split id (head . uncurry filter
+     . split (((==0) .) . mod) (conc
+     . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))) n
 \end{code}
 \[
 \xymatrix@@C=2cm{
-    |Nat| \ar[r]^-{|g|} \ar[d]_-{primes = |anaList g|}
-  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList g)|} \\
+    |Nat| \ar[r]^-{|fst_prime|} \ar[d]_-{primes = |anaList fst_prime|}
+  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList fst_prime)|} \\
     |list(Nat)|
   & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
 }

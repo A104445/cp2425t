@@ -880,24 +880,28 @@ Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4,
 Primeira parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{g}}{}\<[E]%
+\>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{fst\char95 prime}}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{g}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
+\>[B]{}\Varid{fst\char95 prime}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
 \\
-\>[B]{}\Varid{g}\;\Varid{n}\mathrel{=}(i_2\comp \conj{\p2}{\uncurry{\cdot \div \cdot }}\comp {}\<[E]%
+\>[B]{}\Varid{fst\char95 prime}\;\Varid{n}\mathrel{=}(i_2\comp \conj{\p2}{\uncurry{\cdot \div \cdot }}{}\<[E]%
 \\
-\>[B]{}\conj{\Varid{id}}{\Varid{head}\comp \Varid{ap}\comp {}\<[E]%
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\comp \conj{\Varid{id}}{\Varid{head}\comp \uncurry{\Varid{filter}}{}\<[E]%
 \\
-\>[B]{}\conj{\Varid{filter}\comp ((\equiv \mathrm{0})\comp )\comp \Varid{mod}}{\mathsf{conc}\comp {}\<[E]%
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\comp \conj{((\equiv \mathrm{0})\comp )\comp \Varid{mod}}{\mathsf{conc}{}\<[E]%
 \\
-\>[B]{}\conj{(\mathrm{2}\mathbin{:})\comp \Varid{enumFromThenTo}\;\mathrm{3}\;\mathrm{5}\comp \Varid{floor}\comp \Varid{sqrt}\comp \Varid{fromIntegral}}{\Varid{singl}}}})\;\Varid{n}{}\<[E]%
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\comp \conj{(\mathrm{2}\mathbin{:})\comp \Varid{enumFromThenTo}\;\mathrm{3}\;\mathrm{5}\comp \Varid{floor}\comp \Varid{sqrt}\comp \Varid{fromIntegral}}{\Varid{singl}}}})\;\Varid{n}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \[
 \xymatrix@C=2cm{
-    \ensuremath{\N } \ar[r]^-{\ensuremath{\Varid{g}}} \ar[d]_-{primes = \ensuremath{\anaList{\Varid{g}}}}
-  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N } \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{g}}}} \\
+    \ensuremath{\N } \ar[r]^-{\ensuremath{\Varid{fst\char95 prime}}} \ar[d]_-{primes = \ensuremath{\anaList{\Varid{fst\char95 prime}}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N } \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{fst\char95 prime}}}} \\
     \ensuremath{\N ^*}
   & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[l]^-{\ensuremath{\mathsf{in}\mathbin{*}}}
 }
