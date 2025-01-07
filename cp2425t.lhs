@@ -568,12 +568,12 @@ que sejam necessárias.
 Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{code}
-hindex = hyloList f g
+hindex = hyloList fst_hindex fst_min
 
-g [] = i1()
-g xs = (i2 . split p1 (uncurry delete) . split minimum id) xs
+fst_min [] = i1()
+fst_min xs = (i2 . split p1 (uncurry delete) . split minimum id) xs
 
-f = either (const (0,[])) 
+fst_hindex = either (const (0,[])) 
            (cond (uncurry (>=) . (id >< succ . p1)) 
                  (split (succ . p1 . p2) (conc . swap . (singl >< p2))) 
                  p2)
@@ -590,12 +590,12 @@ f = either (const (0,[]))
 
 \[
 \xymatrix@@C=2cm{
-    |list(Nat)| \ar[r]^-{|g|} \ar[d]-{|anaList g|} \ar@@/_3pc/[dd]{|hindex|}
-  & |1 + Nat >< list(Nat)| \ar[d]^-{|id + id >< anaList g|} \\
-    |list(Nat)| \ar[d]_-{|cataList f|} \ar@@/^/[r]^{|out*|}
-  & |1 + Nat >< list(Nat)| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList f|} \\
+    |list(Nat)| \ar[r]^-{|fst_min|} \ar[d]_-{|anaList fst_min|} \ar@@/_6pc/[dd]_-{|hindex = hylo fst_hindex fst_min|}
+  & |1 + Nat >< list(Nat)| \ar[d]^-{|id + id >< anaList fst_min|} \\
+    |list(Nat)| \ar[d]_-{|cataList fst_hindex|} \ar@@/^/[r]^{|out*|}
+  & |1 + Nat >< list(Nat)| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList fst_hindex|} \\
     |Nat >< list(Nat)|
-  & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|f|}
+  & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|fst_hindex|}
 }
 \]
 

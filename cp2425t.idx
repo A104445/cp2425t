@@ -51,6 +51,7 @@
 \indexentry{Função!\emph  {uncurry}|hyperpage}{8}
 \indexentry{Combinador ``pointfree''!\emph  {split}|hyperpage}{8}
 \indexentry{Combinador ``pointfree''!\emph  {split}|hyperpage}{8}
+\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{8}
 \indexentry{Função!\emph  {uncurry}|hyperpage}{8}
 \indexentry{Função!\emph  {succ}|hyperpage}{8}
 \indexentry{Função!$\pi _1$|hyperpage}{8}
@@ -60,7 +61,6 @@
 \indexentry{Função!$\pi _2$|hyperpage}{8}
 \indexentry{Combinador ``pointfree''!\emph  {split}|hyperpage}{8}
 \indexentry{Função!$\pi _2$|hyperpage}{8}
-\indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{8}
 \indexentry{Números naturais ($\mathbb  {N}$)|hyperpage}{8}
 \indexentry{Combinador ``pointfree''!\emph  {ana}!Listas|hyperpage}{8}
 \indexentry{Números naturais ($\mathbb  {N}$)|hyperpage}{8}
