@@ -32,12 +32,26 @@ instance Monad (Expr b) where
 
 --4.3
 
---mcataExpr g =
+mcataExpr :: Monad m => (a + (b + (Op, m [c])) -> m c) -> Expr b a -> m c
+mcataExpr g = g .! (dl . recExpr (mcataExpr g) . outExpr)
+
+dl :: Monad m => (a + (b + (Op, m [c]))) -> m (a + (b + (Op, m [c])))
+dl = either (return.i1)(fmap i2. lstr)
 
 --4.4
 
+--let_exp :: (Num c) => (a -> Expr c b) -> Expr c a -> Expr c b
 --let_exp =
 
 --4.5
 
---evaluate =
+outOp (ITE,[Just a, Just b, Just c]) = Just (if a then b else c)
+outOp (Add,[Just a, Just b]) = Just (a+b)
+outOp (Mul,[Just a, Just b]) = Just (a*b)
+outOp (Suc,[Just a]) = Just (a+1)
+outOp _ = Nothing
+
+evaluate :: (Num a, Ord a) => Expr a b -> Maybe a
+evaluate = mcataExpr (either Nothing (either Just (>>= id)))
+
+--evaluate = either Nothing (either Just (outOp (cataExpr evaluate))) . outExpr

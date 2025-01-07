@@ -561,6 +561,8 @@ que sejam necessárias.
 
 \noindent
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
+%format Nat = "\N "
+%format (list (x)) = x "^*"
 
 \subsection*{Problema 1}
 Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
@@ -588,12 +590,12 @@ f = either (const (0,[]))
 
 \[
 \xymatrix@@C=2cm{
-    |Int*| \ar[r]^{|g|} \ar[d]_-{|anaList g|}
-  & |1 + (Int >< (Int*))| \ar[d]^{|id + id >< (anaList g)|} \\
-    |Int*| \ar[r]^{|out|} \ar[d]_-{|cataNat f|}
-  & |Either 1 (Int >< Int*)| \ar[d]^{|Either id (id >< cataNat f)|} \\
-    |Int >< Int*| 
-  & |Either 1 (Int >< (Int >< Int*))| \ar[l]^-{|f|}
+    |list(Nat)| \ar[r]^-{|g|} \ar[d]-{|anaList g|} \ar@@/_3pc/[dd]{|hindex|}
+  & |1 + Nat >< list(Nat)| \ar[d]^-{|id + id >< anaList g|} \\
+    |list(Nat)| \ar[d]_-{|cataList f|} \ar@@/^/[r]^{|out*|}
+  & |1 + Nat >< list(Nat)| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList f|} \\
+    |Nat >< list(Nat)|
+  & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|f|}
 }
 \]
 
@@ -674,11 +676,26 @@ Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4,
 \subsection*{Problema 2}
 Primeira parte:
 \begin{code}
-primes = undefined
+primes = anaList g
+
+g 1 = i1()
+g n = (i2 . split p2 (uncurry div) .
+split id (head . ap .
+split (filter . ((==0) .) . mod) (conc .
+split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))) n
 \end{code}
+\[
+\xymatrix@@C=2cm{
+    |Nat| \ar[r]^-{|g|} \ar[d]_-{primes = |anaList g|}
+  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList g)|} \\
+    |list(Nat)|
+  & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
+}
+\]
+
 Segunda parte:
 \begin{code}
-prime_tree = undefined
+prime_tree = Term 1 . untar . map (split primes id)
 \end{code}
 
 \subsection*{Problema 3}

@@ -793,12 +793,12 @@ Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvi
 
 \[
 \xymatrix@C=2cm{
-    \ensuremath{\Conid{Int}\mathbin{*}} \ar[r]^{\ensuremath{\Varid{g}}} \ar[d]_-{\ensuremath{\anaList{\Varid{g}}}}
-  & \ensuremath{\mathrm{1}\mathbin{+}(\Conid{Int}\times(\Conid{Int}\mathbin{*}))} \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{g}}}} \\
-    \ensuremath{\Conid{Int}\mathbin{*}} \ar[r]^{\ensuremath{\Varid{out}}} \ar[d]_-{\ensuremath{\cataNat{\Varid{f}}}}
-  & \ensuremath{\mathrm{1}+(\Conid{Int}\times\Conid{Int}\mathbin{*})} \ar[d]^{\ensuremath{\Varid{id}+(\Varid{id}\times\cataNat{\Varid{f}})}} \\
-    \ensuremath{\Conid{Int}\times\Conid{Int}\mathbin{*}} 
-  & \ensuremath{\mathrm{1}+(\Conid{Int}\times(\Conid{Int}\times\Conid{Int}\mathbin{*}))} \ar[l]^-{\ensuremath{\Varid{f}}}
+    \ensuremath{\N ^*} \ar[r]^-{\ensuremath{\Varid{g}}} \ar[d]-{\ensuremath{\anaList{\Varid{g}}}} \ar@/_3pc/[dd]{\ensuremath{\Varid{hindex}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{g}}}} \\
+    \ensuremath{\N ^*} \ar[d]_-{\ensuremath{\llparenthesis\, \Varid{f}\,\rrparenthesis}} \ar@/^/[r]^{\ensuremath{\Varid{out}\mathbin{*}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar@/^/[l]_{\cong}^{\ensuremath{\mathsf{in}\mathbin{*}}} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\llparenthesis\, \Varid{f}\,\rrparenthesis}} \\
+    \ensuremath{\N \times\N ^*}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times(\N \times\N ^*)} \ar[l]^-{\ensuremath{\Varid{f}}}
 }
 \]
 
@@ -881,14 +881,33 @@ Primeira parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{primes}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{g}}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{g}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\Varid{g}\;\Varid{n}\mathrel{=}(i_2\comp \conj{\p2}{\uncurry{\cdot \div \cdot }}\comp {}\<[E]%
+\\
+\>[B]{}\conj{\Varid{id}}{\Varid{head}\comp \Varid{ap}\comp {}\<[E]%
+\\
+\>[B]{}\conj{\Varid{filter}\comp ((\equiv \mathrm{0})\comp )\comp \Varid{mod}}{\mathsf{conc}\comp {}\<[E]%
+\\
+\>[B]{}\conj{(\mathrm{2}\mathbin{:})\comp \Varid{enumFromThenTo}\;\mathrm{3}\;\mathrm{5}\comp \Varid{floor}\comp \Varid{sqrt}\comp \Varid{fromIntegral}}{\Varid{singl}}}})\;\Varid{n}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+\[
+\xymatrix@C=2cm{
+    \ensuremath{\N } \ar[r]^-{\ensuremath{\Varid{g}}} \ar[d]_-{primes = \ensuremath{\anaList{\Varid{g}}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N } \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{g}}}} \\
+    \ensuremath{\N ^*}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[l]^-{\ensuremath{\mathsf{in}\mathbin{*}}}
+}
+\]
+
 Segunda parte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{prime\char95 tree}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{prime\char95 tree}\mathrel{=}\Conid{Term}\;\mathrm{1}\comp \Varid{untar}\comp \map \;\conj{\Varid{primes}}{\Varid{id}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
