@@ -763,13 +763,13 @@ Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvi
 \column{12}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{18}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{hindex}\mathrel{=}\Varid{hyloList}\;\Varid{fst\char95 hindex}\;\Varid{fst\char95 min}{}\<[E]%
+\>[B]{}\Varid{hindex}\mathrel{=}\Varid{hyloList}\;\Varid{calc\char95 hindex}\;\Varid{pop\char95 min}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{fst\char95 min}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}i_1\;(){}\<[E]%
+\>[B]{}\Varid{pop\char95 min}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}i_1\;(){}\<[E]%
 \\
-\>[B]{}\Varid{fst\char95 min}\;\Varid{xs}\mathrel{=}(i_2\comp \conj{\p1}{\uncurry{\Varid{delete}}}\comp \conj{\Varid{minimum}}{\Varid{id}})\;\Varid{xs}{}\<[E]%
+\>[B]{}\Varid{pop\char95 min}\;\Varid{xs}\mathrel{=}(i_2\comp \conj{\p1}{\uncurry{\Varid{delete}}}\comp \conj{\Varid{minimum}}{\Varid{id}})\;\Varid{xs}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{fst\char95 hindex}\mathrel{=}\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\cdot }{}\<[E]%
+\>[B]{}\Varid{calc\char95 hindex}\mathrel{=}\alt{\underline{\mathrm{0},[\mskip1.5mu \mskip1.5mu]}}{\cdot }{}\<[E]%
 \\
 \>[B]{}\hsindent{12}{}\<[12]%
 \>[12]{}(\Varid{cond}\;(\uncurry{(\geq )}\comp (\Varid{id}\times\succ \comp \p1))\;{}\<[E]%
@@ -793,12 +793,12 @@ Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvi
 
 \[
 \xymatrix@C=2cm{
-    \ensuremath{\N ^*} \ar[r]^-{\ensuremath{\Varid{fst\char95 min}}} \ar[d]_-{\ensuremath{\anaList{\Varid{fst\char95 min}}}} \ar@/_6pc/[dd]_-{\ensuremath{\Varid{hindex}\mathrel{=}\llbracket\, \Varid{fst\char95 hindex},\,\Varid{fst\char95 min}\,\rrbracket}}
-  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{fst\char95 min}}}} \\
-    \ensuremath{\N ^*} \ar[d]_-{\ensuremath{\llparenthesis\, \Varid{fst\char95 hindex}\,\rrparenthesis}} \ar@/^/[r]^{\ensuremath{\Varid{out}\mathbin{*}}}
-  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar@/^/[l]_{\cong}^{\ensuremath{\mathsf{in}\mathbin{*}}} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\llparenthesis\, \Varid{fst\char95 hindex}\,\rrparenthesis}} \\
+    \ensuremath{\N ^*} \ar[r]^-{\ensuremath{\Varid{pop\char95 min}}} \ar[d]_-{\ensuremath{\anaList{\Varid{pop\char95 min}}}} \ar@/_6pc/[dd]_-{\ensuremath{\Varid{hindex}\mathrel{=}\llbracket\, \Varid{calc\char95 hindex},\,\Varid{pop\char95 min}\,\rrbracket}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{pop\char95 min}}}} \\
+    \ensuremath{\N ^*} \ar[d]_-{\ensuremath{\llparenthesis\, \Varid{calc\char95 hindex}\,\rrparenthesis}} \ar@/^/[r]^{\ensuremath{\Varid{out}\mathbin{*}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar@/^/[l]_{\cong}^{\ensuremath{\mathsf{in}\mathbin{*}}} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\llparenthesis\, \Varid{calc\char95 hindex}\,\rrparenthesis}} \\
     \ensuremath{\N \times\N ^*}
-  & \ensuremath{\mathrm{1}\mathbin{+}\N \times(\N \times\N ^*)} \ar[l]^-{\ensuremath{\Varid{fst\char95 hindex}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\N \times(\N \times\N ^*)} \ar[l]^-{\ensuremath{\Varid{calc\char95 hindex}}}
 }
 \]
 
@@ -998,7 +998,7 @@ Definição do tipo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{let\char95 exp}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{let\char95 exp}\;\Varid{f}\mathrel{=}(\bind \Varid{f}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Catamorfismo monádico:
@@ -1007,7 +1007,11 @@ Catamorfismo monádico:
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{mcataExpr}\mathrel{=}\bot {}\<[E]%
 \\
-\>[B]{}\mbox{\onelinecomment mcataExpr g = inExpr . (recExpr (mcataExpr g)) . outExpr}{}\<[E]%
+\>[B]{}\mbox{\onelinecomment mcataExpr g = g .! (ddd . recExpr (mcataExpr g) . outExpr)}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment ddd g = either (return.i1) (either (return .i1 .i2) (fmap (i2 . fmap i2) . ppp))}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment ppp l = do x <- l; return x;}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Avaliação de expressões:
@@ -1015,6 +1019,8 @@ Avaliação de expressões:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{evaluate}\mathrel{=}\bot {}\<[E]%
+\\
+\>[B]{}\mbox{\onelinecomment evaluate = mcataExpr (either Just (either Nothing (fmap evaluate)))}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

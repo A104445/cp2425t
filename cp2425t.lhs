@@ -568,12 +568,12 @@ que sejam necessárias.
 Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{code}
-hindex = hyloList fst_hindex fst_min
+hindex = hyloList calc_hindex pop_min
 
-fst_min [] = i1()
-fst_min xs = (i2 . split p1 (uncurry delete) . split minimum id) xs
+pop_min [] = i1()
+pop_min xs = (i2 . split p1 (uncurry delete) . split minimum id) xs
 
-fst_hindex = either (const (0,[])) 
+calc_hindex = either (const (0,[])) 
            (cond (uncurry (>=) . (id >< succ . p1)) 
                  (split (succ . p1 . p2) (conc . swap . (singl >< p2))) 
                  p2)
@@ -590,12 +590,12 @@ fst_hindex = either (const (0,[]))
 
 \[
 \xymatrix@@C=2cm{
-    |list(Nat)| \ar[r]^-{|fst_min|} \ar[d]_-{|anaList fst_min|} \ar@@/_6pc/[dd]_-{|hindex = hylo fst_hindex fst_min|}
-  & |1 + Nat >< list(Nat)| \ar[d]^-{|id + id >< anaList fst_min|} \\
-    |list(Nat)| \ar[d]_-{|cataList fst_hindex|} \ar@@/^/[r]^{|out*|}
-  & |1 + Nat >< list(Nat)| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList fst_hindex|} \\
+    |list(Nat)| \ar[r]^-{|pop_min|} \ar[d]_-{|anaList pop_min|} \ar@@/_6pc/[dd]_-{|hindex = hylo calc_hindex pop_min|}
+  & |1 + Nat >< list(Nat)| \ar[d]^-{|id + id >< anaList pop_min|} \\
+    |list(Nat)| \ar[d]_-{|cataList calc_hindex|} \ar@@/^/[r]^{|out*|}
+  & |1 + Nat >< list(Nat)| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList calc_hindex|} \\
     |Nat >< list(Nat)|
-  & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|fst_hindex|}
+  & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|calc_hindex|}
 }
 \]
 
@@ -740,16 +740,22 @@ instance Monad (Expr b) where
 \emph{Monad}:
 \emph{Let expressions}:
 \begin{code}
-let_exp = undefined
+let_exp f = (>>= f)
 \end{code}
 Catamorfismo monádico:
 \begin{code}
 mcataExpr = undefined
---mcataExpr g = inExpr . (recExpr (mcataExpr g)) . outExpr
+--mcataExpr g = g .! (ddd . recExpr (mcataExpr g) . outExpr)
+
+--ddd g = either (return.i1) (either (return .i1 .i2) (fmap (i2 . fmap i2) . ppp))
+
+--ppp l = do x <- l; return x;
+
 \end{code}
 Avaliação de expressões:
 \begin{code}
 evaluate = undefined
+--evaluate = mcataExpr (either Just (either Nothing (fmap evaluate)))
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
