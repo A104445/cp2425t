@@ -1,41 +1,23 @@
 import List
 import Cp
 
--- convolve :: Num a => [a] -> [a] -> [a]
--- convolve xs ys = [sum [xs !! i * ys !! (j - i) | i <- [max 0 (j - length ys + 1)..min (length xs - 1) j]] | j <- [0..length xs + length ys - 2]]
 
-convolve :: Num a => [a] -> [a] -> [a]
-convolve xs ys = hyloList combineWindows generateWindows (pad xs, reverse ys)
-  where
-    -- Adiciona zeros no início e no final para permitir os deslocamentos
-    pad zs = replicate (length ys - 1) 0 ++ zs ++ replicate (length ys - 1) 0
+--convolve = ap . split (uncurry hyloList (combineWindows >< generateWindows) . (id >< p2)) (pad . p2) . (curry (split (reverse . p2) (id >< length)))
 
-    -- Anamorfismo: Gera as janelas de convolução
-    generateWindows ([], _) = i1 ()
-    generateWindows (xs, ys)
-      | length xs < length ys = i1 ()
-      | otherwise = i2 (take (length ys) xs, (tail xs, ys))
+convolve = ((ap . split ((uncurry hyloList .) (curry combineWindows >< curry generateWindows) . (id >< p2)) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
 
-    -- Catamorfismo: Combina as janelas calculadas
-    combineWindows = either (const []) (\(window, rest) -> sum (zipWith (*) (reverse window) ys) : rest)
-
--- TODO: Implementar uma versão pointwise mais orientada às funções disponibilizadas 
-
-
---convolve :: Num a => [a] -> [a] -> [a]
---convolve xs ys = hyloList (combineWindows ys) generateWindows (pad xs, reverse ys)
+--convolve = ((split (id >< p2) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
 
 -- Adiciona zeros no início e no final para permitir os deslocamentos
---pad zs ys = replicate (length ys - 1) 0 ++ zs ++ replicate (length ys - 1) 0
+pad = conc . split p2 conc . (id >< ap . split replicate (const 0)) . (id >< ap . split (-) (const 1))
 
 -- Anamorfismo: Gera as janelas de convolução
---generateWindows ([], _) = i1 ()
---generateWindows (xs, ys)
---  | length xs < length ys = i1 ()
---  | otherwise = i2 (take (length ys) xs, (tail xs, ys))
+generateWindows (n,xs)
+    | length xs < n = i1 ()
+    | otherwise = i2 (take n xs, tail xs)
 
 -- Catamorfismo: Combina as janelas calculadas
---combineWindows ys = either (const []) (\(window, rest) -> sum (zipWith (*) (window) ys) : rest)
+combineWindows (ys,xs) = (either (const []) (\(window, rest) -> sum (zipWith (*) (window) ys) : rest)) xs
 
 -- TODO: Implementar uma versão pointwise mais orientada às funções disponibilizadas 
 
