@@ -730,6 +730,7 @@ instance Applicative (Expr b) where
      (<*>) = aap
      pure  = return
 instance Monad (Expr b) where
+    --x >>= g = (u . fmap f) x
     return  = V
     --e >>= g = (cataExpr () . fmap g) e
     (V a) >>= g = g a
@@ -744,18 +745,38 @@ let_exp f = (>>= f)
 \end{code}
 Catamorfismo monádico:
 \begin{code}
-mcataExpr = undefined
---mcataExpr g = g .! (ddd . recExpr (mcataExpr g) . outExpr)
+--mcataExpr = undefined
+mcataExpr g = g .! (d . recExpr (mcataExpr g) . outExpr)
 
---ddd g = either (return.i1) (either (return .i1 .i2) (fmap (i2 . fmap i2) . ppp))
+d :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
+d = either (return.i1) (either (return.i2.i1) (fmap (i2.i2) . l))
 
---ppp l = do x <- l; return x;
+l :: Monad m => (Op, [m c]) -> m (Op, m [c])
+l (op, t) = do
+    -- Transformar `t :: [m c]` em `m [c]` usando `sequence`
+    mcs <- sequence t  -- mcs :: m [c]
+    return (op, return mcs)
 
 \end{code}
 Avaliação de expressões:
 \begin{code}
-evaluate = undefined
---evaluate = mcataExpr (either Just (either Nothing (fmap evaluate)))
+--evaluate = undefined
+evaluate = mcataExpr (inMaybe . fu)
+
+--(Either a (Either b (Op, m [c])) -> m c)
+fu :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Either () a
+fu (Left _) = Left ()  -- Variáveis produzem erro
+fu (Right (Left n)) = Right n  -- Números são válidos
+fu (Right (Right (op, Just args))) = evalOp op (args)
+fu (Right (Right (op, Nothing))) = Left()
+
+evalOp :: (Num a, Ord a) => Op -> [a] -> Either () a
+evalOp Suc [x] = Right (x + 1)
+evalOp Add [x, y] = Right (x + y)
+evalOp Mul [x, y] = Right (x * y)
+evalOp ITE [x, y, z] = if x == 0 then Right (y) else Right (z)
+evalOp _ _        = Left ()  -- Qualquer outro caso falha
+
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
