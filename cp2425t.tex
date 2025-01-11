@@ -1037,41 +1037,27 @@ Avaliação de expressões:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{19}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{32}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\mbox{\onelinecomment evaluate = undefined}{}\<[E]%
-\\
 \>[B]{}\Varid{evaluate}\mathrel{=}\Varid{mcataExpr}\;(\Varid{inMaybe}\comp \Varid{fu}){}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\mbox{\onelinecomment (Either a (Either b (Op, m [c])) -> m c)}{}\<[E]%
-\\
 \>[B]{}\Varid{fu}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Varid{b}+(\Varid{a}+(\Conid{Op},\Conid{Maybe}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to ()+\Varid{a}{}\<[E]%
 \\
-\>[B]{}\Varid{fu}\;(i_1\;\anonymous )\mathrel{=}i_1\;(){}\<[24]%
-\>[24]{}\mbox{\onelinecomment  Variáveis produzem erro}{}\<[E]%
-\\
-\>[B]{}\Varid{fu}\;(i_2\;(i_1\;\Varid{n}))\mathrel{=}i_2\;\Varid{n}{}\<[32]%
-\>[32]{}\mbox{\onelinecomment  Números são válidos}{}\<[E]%
-\\
-\>[B]{}\Varid{fu}\;(i_2\;(i_2\;(\Varid{op},\Conid{Just}\;\Varid{args})))\mathrel{=}\Varid{evalOp}\;\Varid{op}\;(\Varid{args}){}\<[E]%
-\\
-\>[B]{}\Varid{fu}\;(i_2\;(i_2\;(\Varid{op},\Conid{Nothing})))\mathrel{=}i_1\;(){}\<[E]%
+\>[B]{}\Varid{fu}\mathrel{=}\alt{\underline{i_1\;()}}{\alt{i_2}{\uncurry{\Varid{evalOp}}}}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{evalOp}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to ()+\Varid{a}{}\<[E]%
+\>[B]{}\Varid{evalOp}\mathbin{::}(\Conid{Num}\;\Varid{a},\Conid{Ord}\;\Varid{a})\Rightarrow \Conid{Op}\to \Conid{Maybe}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]\to ()+\Varid{a}{}\<[E]%
 \\
-\>[B]{}\Varid{evalOp}\;\Conid{Suc}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mathrel{=}i_2\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
+\>[B]{}\Varid{evalOp}\;\Conid{Suc}\;(\Conid{Just}\;[\mskip1.5mu \Varid{x}\mskip1.5mu])\mathrel{=}i_2\;(\Varid{x}\mathbin{+}\mathrm{1}){}\<[E]%
 \\
-\>[B]{}\Varid{evalOp}\;\Conid{Add}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}i_2\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
+\>[B]{}\Varid{evalOp}\;\Conid{Add}\;(\Conid{Just}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu])\mathrel{=}i_2\;(\Varid{x}\mathbin{+}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{evalOp}\;\Conid{Mul}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mathrel{=}i_2\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
+\>[B]{}\Varid{evalOp}\;\Conid{Mul}\;(\Conid{Just}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu])\mathrel{=}i_2\;(\Varid{x}\mathbin{*}\Varid{y}){}\<[E]%
 \\
-\>[B]{}\Varid{evalOp}\;\Conid{ITE}\;[\mskip1.5mu \Varid{x},\Varid{y},\Varid{z}\mskip1.5mu]\mathrel{=}\mathbf{if}\;\Varid{x}\equiv \mathrm{0}\;\mathbf{then}\;i_2\;(\Varid{y})\;\mathbf{else}\;i_2\;(\Varid{z}){}\<[E]%
+\>[B]{}\Varid{evalOp}\;\Conid{ITE}\;(\Conid{Just}\;[\mskip1.5mu \Varid{x},\Varid{y},\Varid{z}\mskip1.5mu])\mathrel{=}\mathbf{if}\;\Varid{x}\not\equiv \mathrm{0}\;\mathbf{then}\;i_2\;(\Varid{y})\;\mathbf{else}\;i_2\;(\Varid{z}){}\<[E]%
 \\
 \>[B]{}\Varid{evalOp}\;\anonymous \;\anonymous {}\<[19]%
-\>[19]{}\mathrel{=}i_1\;(){}\<[30]%
-\>[30]{}\mbox{\onelinecomment  Qualquer outro caso falha}{}\<[E]%
+\>[19]{}\mathrel{=}i_1\;(){}\<[27]%
+\>[27]{}\mbox{\onelinecomment  Qualquer outro caso falha}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

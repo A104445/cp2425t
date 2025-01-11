@@ -760,22 +760,17 @@ l (op, t) = do
 \end{code}
 Avaliação de expressões:
 \begin{code}
---evaluate = undefined
 evaluate = mcataExpr (inMaybe . fu)
 
---(Either a (Either b (Op, m [c])) -> m c)
 fu :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Either () a
-fu (Left _) = Left ()  -- Variáveis produzem erro
-fu (Right (Left n)) = Right n  -- Números são válidos
-fu (Right (Right (op, Just args))) = evalOp op (args)
-fu (Right (Right (op, Nothing))) = Left()
+fu = either (const (i1())) (either (i2) (uncurry evalOp))
 
-evalOp :: (Num a, Ord a) => Op -> [a] -> Either () a
-evalOp Suc [x] = Right (x + 1)
-evalOp Add [x, y] = Right (x + y)
-evalOp Mul [x, y] = Right (x * y)
-evalOp ITE [x, y, z] = if x == 0 then Right (y) else Right (z)
-evalOp _ _        = Left ()  -- Qualquer outro caso falha
+evalOp :: (Num a, Ord a) => Op -> Maybe [a] -> Either () a
+evalOp Suc (Just [x]) = i2(x + 1)
+evalOp Add (Just [x, y]) = i2(x + y)
+evalOp Mul (Just [x, y]) = i2(x * y)
+evalOp ITE (Just [x, y, z]) = if x /= 0 then i2(y) else i2(z)
+evalOp _ _        = i1()  -- Qualquer outro caso falha
 
 \end{code}
 
