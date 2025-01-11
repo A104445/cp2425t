@@ -624,6 +624,7 @@ prime_tree = Term 1 . untar . map (split primes id)
 \end{code}
 
 \subsection*{Problema 3}
+Para resolver o problema 3, do cálculo da convolução de duas listas a e b, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
@@ -640,14 +641,14 @@ combineWindows :: Num a => ([a], Either () ([a], [a])) -> [a]
 combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum . (zipWith (*) ys) . p1) p2)) >< id)
 \end{code}
 
-\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. O cálculo baseia-se nas seguintes funções auxiliares:
+\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados, mais especificamente aqui irá gerar janelas) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado, mais especificamente aqui irá combinar janelas dando origem a um resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo e ainda tivemos de desenvolver outras funções auxiliares:
 
 \begin{itemize}
-    \item \texttt{pad}: Uma função que adiciona zeros no final da lista para garantir que ambas as listas têm o mesmo comprimento. Recebe um par onde o primeiro elemento é a lista original e o segundo é o número de elementos a adicionar. A função replica zeros e concatena-os à lista original.
+    \item \texttt{pad}: Uma função que adiciona zeros no final e no início da lista. Recebe um par onde o primeiro elemento é a primeira lista e o segundo é o comprimento da segunda lista. A função replica zeros e concatena-os à lista original.
 
-    \item \texttt{generateWindows}: Uma função anamórfica que gera janelas de valores da lista original. Para evitar casos inválidos, verifica se o comprimento da janela excede o comprimento da lista. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par em \texttt{i2()}, contendo a janela atual e a parte restante da lista.
+    \item \texttt{generateWindows}: Esta função é o gene do anamorfismo que irá gerar as janelas. Esta função gera uma janela de valores da lista original. Para evitar casos inválidos, verifica se o comprimento da janela excede o comprimento da lista. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par envolvido em \texttt{i2}, contendo a janela atual gerada e a parte restante da lista.
 
-    \item \texttt{combineWindows}: Uma função catamórfica que combina as janelas geradas com os valores da segunda lista, aplicando a operação de convolução. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
+    \item \texttt{combineWindows}: Esta função é o gene do catamorfismo que irá combinas as janelas. Esta função combina uma janelas gerada com os valores da segunda lista, aplicando a operação de convolução. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
 \end{itemize}
 
 \noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista.
