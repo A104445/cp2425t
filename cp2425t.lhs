@@ -627,11 +627,11 @@ prime_tree = Term 1 . untar . map (split primes id)
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< curry generateWindows) . (id >< p2)) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
-
-pad = conc . split p2 conc . (id >< Cp.ap . split replicate (const 0)) . (id >< Cp.ap . split (-) (const 1))
+convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry generateWindows . p2))) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
 
 pad :: Num a => ([a],Int) -> [a]
+pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
+
 generateWindows = cond (uncurry (>) . (id >< length)) (const i1()) (i2 . split (uncurry take) (tail . p2))
 
 combineWindows :: Num a => ([a],Either () ([a],[a])) -> [a]
