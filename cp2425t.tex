@@ -922,7 +922,17 @@ Segunda parte:
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{convolve}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{convolve}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{convolve}\mathrel{=}((\Varid{\Conid{Cp}.ap}\comp \conj{(\uncurry{\Varid{hyloList}}\comp )\;(\overline{\Varid{combineWindows}}\times\overline{\Varid{generateWindows}})\comp (\Varid{id}\times\p2)}{\Varid{pad}\comp \p2})\comp )\comp \overline{\conj{\Varid{reverse}\comp \p2}{\Varid{id}\times\length }}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{pad}\mathrel{=}\mathsf{conc}\comp \conj{\p2}{\mathsf{conc}}\comp (\Varid{id}\times\Varid{\Conid{Cp}.ap}\comp \conj{\Varid{replicate}}{\underline{\mathrm{0}}})\comp (\Varid{id}\times\Varid{\Conid{Cp}.ap}\comp \conj{\mathbin{-}}{\underline{\mathrm{1}}}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{pad}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],\Conid{Int})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{generateWindows}\mathrel{=}\Varid{cond}\;(\uncurry{(\mathbin{>})}\comp (\Varid{id}\times\length ))\;\underline{i_1}\;()\;(i_2\comp \conj{\uncurry{\Varid{take}}}{\Varid{tail}\comp \p2}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{combineWindows}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],()+([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{combineWindows}\mathrel{=}\Varid{\Conid{Cp}.ap}\comp ((\lambda \Varid{ys}\to \alt{\underline{[\mskip1.5mu \mskip1.5mu]}}{\mathsf{conc}\comp \conj{\Varid{singl}\comp \Varid{sum}\comp (\Varid{zipWith}\;(\mathbin{*})\;\Varid{ys})\comp \p1}{\p2}})\times\Varid{id}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
