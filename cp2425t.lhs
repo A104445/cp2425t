@@ -627,17 +627,30 @@ prime_tree = Term 1 . untar . map (split primes id)
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry generateWindows . p2))) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
+convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< curry generateWindows) 
+                . (id >< p2)) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
 
-pad :: Num a => ([a],Int) -> [a]
-pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
+pad :: Num a => ([a], Int) -> [a]
+pad = conc . split p2 conc . (id >< Cp.ap . split replicate (const 0)) . (id >< Cp.ap . split (-) (const 1))
 
+generateWindows :: Num a => ([a], Int) -> Either () ([a], [a])
 generateWindows = cond (uncurry (>) . (id >< length)) (const i1()) (i2 . split (uncurry take) (tail . p2))
 
-combineWindows :: Num a => ([a],Either () ([a],[a])) -> [a]
-combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum . (zipWith (*) ys) . p1) (p2))) >< id)
-
+combineWindows :: Num a => ([a], Either () ([a], [a])) -> [a]
+combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum . (zipWith (*) ys) . p1) p2)) >< id)
 \end{code}
+
+\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. O cálculo baseia-se nas seguintes funções auxiliares:
+
+\begin{itemize}
+    \item \texttt{pad}: Uma função que adiciona zeros no final da lista para garantir que ambas as listas têm o mesmo comprimento. Recebe um par onde o primeiro elemento é a lista original e o segundo é o número de elementos a adicionar. A função replica zeros e concatena-os à lista original.
+
+    \item \texttt{generateWindows}: Uma função anamórfica que gera janelas de valores da lista original. Para evitar casos inválidos, verifica se o comprimento da janela excede o comprimento da lista. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par em \texttt{i2()}, contendo a janela atual e a parte restante da lista.
+
+    \item \texttt{combineWindows}: Uma função catamórfica que combina as janelas geradas com os valores da segunda lista, aplicando a operação de convolução. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
+\end{itemize}
+
+\noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista.
 
 \subsection*{Problema 4}
 Definição do tipo:
