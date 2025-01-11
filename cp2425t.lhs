@@ -579,14 +579,13 @@ calc_hindex = either (const (0,[]))
                  p2)
 \end{code}
 
-\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista representando o histograma. O cálculo baseia-se nas seguintes funções:
+\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma. O cálculo baseia-se nas seguintes funções:
 
 \begin{itemize}
-    \item \texttt{g}: Uma função anamórfica que decompõe o histograma em subestruturas, identificando a barra com a menor altura e preparando os dados para processamento.
-    \item \texttt{f}: Uma função catamórfica que processa a estrutura gerada por \texttt{g} para calcular o H-index e identificar as barras que contribuem para o resultado.
+    \item \texttt{pop\_min}: Uma função anamórfica que decompõe o histograma em subestruturas. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}.
+    
+    \item \texttt{calc\_hindex}: Uma função catamórfica que processa a estrutura gerada por \texttt{pop\_min} para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left}, devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right}, avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas a lista de contribuições acumuladas.
 \end{itemize}
-
-\noindent O uso de \emph{combinadores} como \texttt{hyloList}, \texttt{split}, e \texttt{cond} torna a solução elegante e composicional, refletindo a abordagem funcional desta disciplina.
 
 \[
 \xymatrix@@C=2cm{
@@ -598,80 +597,6 @@ calc_hindex = either (const (0,[]))
   & |1 + Nat >< (Nat >< list(Nat))| \ar[l]^-{|calc_hindex|}
 }
 \]
-
-\subsubsection*{Exemplo de execução do algoritmo que desenvolvemos}
-
-Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4, 9]}:
-
-\begin{itemize}
-    \item \texttt{n}: o menor elemento da lista atual (fornecido por \texttt{g}).
-    \item \texttt{k}: o índice acumulado até o momento.
-    \item \texttt{xs}: a lista restante após remover o menor elemento.
-\end{itemize}
-
-\begin{itemize}
-    \item \textbf{Primeira iteração}:
-    \begin{align*}
-        g([5, 2, 7, 1, 8, 6, 4, 9]) &= \texttt{Right (1, [5, 2, 7, 8, 6, 4, 9])} \\
-        f(1, 0, [5, 2, 7, 8, 6, 4, 9]) &= (1, [5, 2, 7, 8, 6, 4, 9])
-    \end{align*}
-    Aqui, \texttt{n = 1}, \texttt{k = 0}, e \texttt{xs = [5, 2, 7, 8, 6, 4, 9]}. A condição verificada é:
-    \[
-    1 \geq 0 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Segunda iteração}:
-    \begin{align*}
-        g([5, 2, 7, 8, 6, 4, 9]) &= \texttt{Right (2, [5, 7, 8, 6, 4, 9])} \\
-        f(2, 1, [5, 7, 8, 6, 4, 9]) &= (2, [5, 7, 8, 6, 4, 9])
-    \end{align*}
-    Aqui, \texttt{n = 2}, \texttt{k = 1}, e \texttt{xs = [5, 7, 8, 6, 4, 9]}. A condição verificada é:
-    \[
-    2 \geq 1 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Terceira iteração}:
-    \begin{align*}
-        g([5, 7, 8, 6, 4, 9]) &= \texttt{Right (4, [5, 7, 8, 6, 9])} \\
-        f(4, 2, [5, 7, 8, 6, 9]) &= (3, [5, 7, 8, 6, 9])
-    \end{align*}
-    Aqui, \texttt{n = 4}, \texttt{k = 2}, e \texttt{xs = [5, 7, 8, 6, 9]}. A condição verificada é:
-    \[
-    4 \geq 2 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Quarta iteração}:
-    \begin{align*}
-        g([5, 7, 8, 6, 9]) &= \texttt{Right (5, [7, 8, 6, 9])} \\
-        f(5, 3, [7, 8, 6, 9]) &= (4, [7, 8, 6, 9])
-    \end{align*}
-    Aqui, \texttt{n = 5}, \texttt{k = 3}, e \texttt{xs = [7, 8, 6, 9]}. A condição verificada é:
-    \[
-    5 \geq 3 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Quinta iteração}:
-    \begin{align*}
-        g([7, 8, 6, 9]) &= \texttt{Right (6, [7, 8, 9])} \\
-        f(6, 4, [7, 8, 9]) &= (5, [7, 8, 9])
-    \end{align*}
-    Aqui, \texttt{n = 6}, \texttt{k = 4}, e \texttt{xs = [7, 8, 9]}. A condição verificada é:
-    \[
-    6 \geq 4 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Sexta iteração (condição falha)}:
-    \begin{align*}
-        g([7, 8, 9]) &= \texttt{Right (7, [8, 9])} \\
-        f(7, 5, [8, 9]) &= (5, [8, 9])
-    \end{align*}
-    Aqui, \texttt{n = 7}, \texttt{k = 5}, e \texttt{xs = [8, 9]}. A condição verificada é:
-    \[
-    7 \geq 5 + 1 \quad \text{(falso, parar o cálculo)}
-    \]
-\end{itemize}
-
-\noindent O cálculo para na sexta iteração, pois a condição avaliada por \texttt{f} é falsa. O valor final do \textbf{H-index} é, portanto, \textbf{5}.
 
 \subsection*{Problema 2}
 Primeira parte:
