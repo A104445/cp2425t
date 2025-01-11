@@ -565,7 +565,7 @@ que sejam necessárias.
 %format (list (x)) = x "^*"
 
 \subsection*{Problema 1}
-Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
+Para resolver o problema 1, do cálculo do H-index de um histograma e da lista de colunas do histograma que para ele contribuem, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{code}
 hindex = hyloList calc_hindex pop_min
@@ -579,12 +579,12 @@ calc_hindex = either (const (0,[]))
                  p2)
 \end{code}
 
-\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma. O cálculo baseia-se nas seguintes funções:
+\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma e para determinar a lista de colunas do histograma que contribuem para o H-index. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados ou outro tipo de estrutura a partir de um estado inicial) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo, respetivamente:
 
 \begin{itemize}
-    \item \texttt{pop\_min}: Uma função anamórfica que decompõe o histograma em subestruturas. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}.
+    \item \texttt{pop\_min}: Esta função é o gene do anamorfismo que irá decompor o histograma em substruturas. Esta função calcula o mínimo de uma lista e a lista sem esse mínimo. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo da lista e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}, o lado direito de um tipo \texttt{Either}. 
     
-    \item \texttt{calc\_hindex}: Uma função catamórfica que processa a estrutura gerada por \texttt{pop\_min} para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left}, devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right}, avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas a lista de contribuições acumuladas.
+    \item \texttt{calc\_hindex}: Esta função é o gene do catamorfismo que irá processar (consumir) a estrutura gerada pelo anamorfismo para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left} (\texttt{i2}), devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right} (\texttt{i1}), avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador (H-index) e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas o H-index anterior e a lista de contribuições anteriormente acumuladas.
 \end{itemize}
 
 \[
@@ -627,11 +627,11 @@ prime_tree = Term 1 . untar . map (split primes id)
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< curry generateWindows) 
-                . (id >< p2)) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
+convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry generateWindows . p2)) 
+                ) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
 
 pad :: Num a => ([a], Int) -> [a]
-pad = conc . split p2 conc . (id >< Cp.ap . split replicate (const 0)) . (id >< Cp.ap . split (-) (const 1))
+pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
 
 generateWindows :: Num a => ([a], Int) -> Either () ([a], [a])
 generateWindows = cond (uncurry (>) . (id >< length)) (const i1()) (i2 . split (uncurry take) (tail . p2))

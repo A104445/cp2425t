@@ -756,7 +756,7 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
-Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvida a seguinte solução em Haskell:
+Para resolver o problema 1, do cálculo do H-index de um histograma e da lista de colunas do histograma que para ele contribuem, foi desenvolvida a seguinte solução em Haskell:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -782,14 +782,13 @@ Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvi
 \ColumnHook
 \end{hscode}\resethooks
 
-\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista representando o histograma. O cálculo baseia-se nas seguintes funções:
+\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma e para determinar a lista de colunas do histograma que contribuem para o H-index. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados ou outro tipo de estrutura a partir de um estado inicial) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo, respetivamente:
 
 \begin{itemize}
-    \item \texttt{g}: Uma função anamórfica que decompõe o histograma em subestruturas, identificando a barra com a menor altura e preparando os dados para processamento.
-    \item \texttt{f}: Uma função catamórfica que processa a estrutura gerada por \texttt{g} para calcular o H-index e identificar as barras que contribuem para o resultado.
+    \item \texttt{pop\_min}: Esta função é o gene do anamorfismo que irá decompor o histograma em substruturas. Esta função calcula o mínimo de uma lista e a lista sem esse mínimo. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo da lista e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}, o lado direito de um tipo \texttt{Either}. 
+    
+    \item \texttt{calc\_hindex}: Esta função é o gene do catamorfismo que irá processar (consumir) a estrutura gerada pelo anamorfismo para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left} (\texttt{i2}), devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right} (\texttt{i1}), avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador (H-index) e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas o H-index anterior e a lista de contribuições anteriormente acumuladas.
 \end{itemize}
-
-\noindent O uso de \emph{combinadores} como \texttt{hyloList}, \texttt{split}, e \texttt{cond} torna a solução elegante e composicional, refletindo a abordagem funcional desta disciplina.
 
 \[
 \xymatrix@C=2cm{
@@ -801,80 +800,6 @@ Para resolver o problema do cálculo do H-index de um histograma, foi desenvolvi
   & \ensuremath{\mathrm{1}\mathbin{+}\N \times(\N \times\N ^*)} \ar[l]^-{\ensuremath{\Varid{calc\char95 hindex}}}
 }
 \]
-
-\subsubsection*{Exemplo de execução do algoritmo que desenvolvemos}
-
-Vamos calcular o \textbf{H-index} para a lista \texttt{h = [5, 2, 7, 1, 8, 6, 4, 9]}:
-
-\begin{itemize}
-    \item \texttt{n}: o menor elemento da lista atual (fornecido por \texttt{g}).
-    \item \texttt{k}: o índice acumulado até o momento.
-    \item \texttt{xs}: a lista restante após remover o menor elemento.
-\end{itemize}
-
-\begin{itemize}
-    \item \textbf{Primeira iteração}:
-    \begin{align*}
-        g([5, 2, 7, 1, 8, 6, 4, 9]) &= \texttt{Right (1, [5, 2, 7, 8, 6, 4, 9])} \\
-        f(1, 0, [5, 2, 7, 8, 6, 4, 9]) &= (1, [5, 2, 7, 8, 6, 4, 9])
-    \end{align*}
-    Aqui, \texttt{n = 1}, \texttt{k = 0}, e \texttt{xs = [5, 2, 7, 8, 6, 4, 9]}. A condição verificada é:
-    \[
-    1 \geq 0 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Segunda iteração}:
-    \begin{align*}
-        g([5, 2, 7, 8, 6, 4, 9]) &= \texttt{Right (2, [5, 7, 8, 6, 4, 9])} \\
-        f(2, 1, [5, 7, 8, 6, 4, 9]) &= (2, [5, 7, 8, 6, 4, 9])
-    \end{align*}
-    Aqui, \texttt{n = 2}, \texttt{k = 1}, e \texttt{xs = [5, 7, 8, 6, 4, 9]}. A condição verificada é:
-    \[
-    2 \geq 1 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Terceira iteração}:
-    \begin{align*}
-        g([5, 7, 8, 6, 4, 9]) &= \texttt{Right (4, [5, 7, 8, 6, 9])} \\
-        f(4, 2, [5, 7, 8, 6, 9]) &= (3, [5, 7, 8, 6, 9])
-    \end{align*}
-    Aqui, \texttt{n = 4}, \texttt{k = 2}, e \texttt{xs = [5, 7, 8, 6, 9]}. A condição verificada é:
-    \[
-    4 \geq 2 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Quarta iteração}:
-    \begin{align*}
-        g([5, 7, 8, 6, 9]) &= \texttt{Right (5, [7, 8, 6, 9])} \\
-        f(5, 3, [7, 8, 6, 9]) &= (4, [7, 8, 6, 9])
-    \end{align*}
-    Aqui, \texttt{n = 5}, \texttt{k = 3}, e \texttt{xs = [7, 8, 6, 9]}. A condição verificada é:
-    \[
-    5 \geq 3 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Quinta iteração}:
-    \begin{align*}
-        g([7, 8, 6, 9]) &= \texttt{Right (6, [7, 8, 9])} \\
-        f(6, 4, [7, 8, 9]) &= (5, [7, 8, 9])
-    \end{align*}
-    Aqui, \texttt{n = 6}, \texttt{k = 4}, e \texttt{xs = [7, 8, 9]}. A condição verificada é:
-    \[
-    6 \geq 4 + 1 \quad \text{(verdadeiro)}
-    \]
-
-    \item \textbf{Sexta iteração (condição falha)}:
-    \begin{align*}
-        g([7, 8, 9]) &= \texttt{Right (7, [8, 9])} \\
-        f(7, 5, [8, 9]) &= (5, [8, 9])
-    \end{align*}
-    Aqui, \texttt{n = 7}, \texttt{k = 5}, e \texttt{xs = [8, 9]}. A condição verificada é:
-    \[
-    7 \geq 5 + 1 \quad \text{(falso, parar o cálculo)}
-    \]
-\end{itemize}
-
-\noindent O cálculo para na sexta iteração, pois a condição avaliada por \texttt{f} é falsa. O valor final do \textbf{H-index} é, portanto, \textbf{5}.
 
 \subsection*{Problema 2}
 Primeira parte:
@@ -919,14 +844,20 @@ Segunda parte:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{18}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{convolve}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{convolve}\mathrel{=}((\Varid{\Conid{Cp}.ap}\comp \conj{(\uncurry{\Varid{hyloList}}\comp )\;(\overline{\Varid{combineWindows}}\times\overline{\Varid{generateWindows}})\comp (\Varid{id}\times\p2)}{\Varid{pad}\comp \p2})\comp )\comp \overline{\conj{\Varid{reverse}\comp \p2}{\Varid{id}\times\length }}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{pad}\mathrel{=}\mathsf{conc}\comp \conj{\p2}{\mathsf{conc}}\comp (\Varid{id}\times\Varid{\Conid{Cp}.ap}\comp \conj{\Varid{replicate}}{\underline{\mathrm{0}}})\comp (\Varid{id}\times\Varid{\Conid{Cp}.ap}\comp \conj{\mathbin{-}}{\underline{\mathrm{1}}}){}\<[E]%
+\>[B]{}\Varid{convolve}\mathrel{=}((\Varid{\Conid{Cp}.ap}\comp \conj{(\uncurry{\Varid{hyloList}}\comp )\;(\overline{\Varid{combineWindows}}\times(\overline{\Varid{generateWindows}}\comp \p2))}{\cdot }{}\<[E]%
+\\
+\>[B]{}\hsindent{18}{}\<[18]%
+\>[18]{}(\Varid{pad}\comp \p2))\comp )\comp \overline{\conj{\Varid{reverse}\comp \p2}{\Varid{id}\times\length }}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{pad}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],\Conid{Int})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{pad}\mathrel{=}\mathsf{conc}\comp \conj{\p2}{\mathsf{conc}}\comp (\Varid{id}\times(\mathbin{`\Varid{replicate}`}\mathrm{0})\comp (\Varid{subtract}\;\mathrm{1})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{generateWindows}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],\Conid{Int})\to ()+([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu]){}\<[E]%
 \\
 \>[B]{}\Varid{generateWindows}\mathrel{=}\Varid{cond}\;(\uncurry{(\mathbin{>})}\comp (\Varid{id}\times\length ))\;\underline{i_1}\;()\;(i_2\comp \conj{\uncurry{\Varid{take}}}{\Varid{tail}\comp \p2}){}\<[E]%
 \\[\blanklineskip]%
@@ -935,6 +866,18 @@ Segunda parte:
 \>[B]{}\Varid{combineWindows}\mathrel{=}\Varid{\Conid{Cp}.ap}\comp ((\lambda \Varid{ys}\to \alt{\underline{[\mskip1.5mu \mskip1.5mu]}}{\mathsf{conc}\comp \conj{\Varid{singl}\comp \Varid{sum}\comp (\Varid{zipWith}\;(\mathbin{*})\;\Varid{ys})\comp \p1}{\p2}})\times\Varid{id}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. O cálculo baseia-se nas seguintes funções auxiliares:
+
+\begin{itemize}
+    \item \texttt{pad}: Uma função que adiciona zeros no final da lista para garantir que ambas as listas têm o mesmo comprimento. Recebe um par onde o primeiro elemento é a lista original e o segundo é o número de elementos a adicionar. A função replica zeros e concatena-os à lista original.
+
+    \item \texttt{generateWindows}: Uma função anamórfica que gera janelas de valores da lista original. Para evitar casos inválidos, verifica se o comprimento da janela excede o comprimento da lista. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par em \texttt{i2()}, contendo a janela atual e a parte restante da lista.
+
+    \item \texttt{combineWindows}: Uma função catamórfica que combina as janelas geradas com os valores da segunda lista, aplicando a operação de convolução. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
+\end{itemize}
+
+\noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista.
 
 \subsection*{Problema 4}
 Definição do tipo:
