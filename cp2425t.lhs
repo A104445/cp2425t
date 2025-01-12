@@ -579,11 +579,13 @@ calc_hindex = either (const (0,[]))
                  p2)
 \end{code}
 
-\noindent A função \texttt{hindex} aplica um hilomorfismo (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma e para determinar a lista de colunas do histograma que contribuem para o H-index. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados ou outro tipo de estrutura a partir de um estado inicial) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo, respetivamente:
+\noindent A função \texttt{hindex} aplica um hilomorfismo de listas (\texttt{hyloList}) para determinar o H-index de uma lista que representa o histograma e para determinar a lista de colunas do histograma que contribuem para o H-index. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados ou outro tipo de estrutura a partir de um estado inicial) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo, respetivamente:
 
 \begin{itemize}
-    \item \texttt{pop\_min}: Esta função é o gene do anamorfismo que irá decompor o histograma em substruturas. Esta função calcula o mínimo de uma lista e a lista sem esse mínimo. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo da lista e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}, o lado direito de um tipo \texttt{Either}. 
-    
+    \item \texttt{pop\_min}: Esta função é o gene do anamorfismo que irá gerar uma estrutura de dados apartir do histograma.
+    Este anamorfismo irá, mais concretamente, apartir do histograma, gerar uma lista ordenada por ordem crescente.
+    Esta função calcula o mínimo de uma lista e a lista sem esse mínimo. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo da lista e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}, o lado direito de um tipo \texttt{Either}. 
+    Com este gene, o anamorfismo vai pegando no mínimo da lista e juntando a nova lista, o que irá gerar uma lista ordenada por ordem crescente. Este anamorfismo é o selection sort.
     \item \texttt{calc\_hindex}: Esta função é o gene do catamorfismo que irá processar (consumir) a estrutura gerada pelo anamorfismo para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left} (\texttt{i2}), devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right} (\texttt{i1}), avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador (H-index) e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas o H-index anterior e a lista de contribuições anteriormente acumuladas.
 \end{itemize}
 
@@ -603,10 +605,10 @@ Primeira parte:
 
 Para resolver o problema 2.1, de cálculo dos fatores primos de um número inteiro positivo, foi desenvolvida a seguinte solução:
 \begin{code}
-primes = anaList prime_divide
+primes = anaList divByPrime
 
-prime_divide 1 = i1()
-prime_divide n = (i2 . split p2 (uncurry div) . split id fst_prime) n
+divByPrime 1 = i1()
+divByPrime n = (i2 . split p2 (uncurry div) . split id fst_prime) n
 
 fst_prime = (head . uncurry filter
      . split (((==0) .) . mod) (conc
@@ -616,15 +618,47 @@ fst_prime = (head . uncurry filter
 Diagrama do anamorfismo:
 \[
 \xymatrix@@C=2cm{
-    |Nat| \ar[r]^-{|prime_divide|} \ar[d]_-{primes = |anaList prime_divide|}
-  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList prime_divide)|} \\
+    |Nat| \ar[r]^-{|divByPrime|} \ar[d]_-{primes = |anaList divByPrime|}
+  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList divByPrime)|} \\
+    |list(Nat)|
+  & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
+}
+\]
+
+Em primeiro lugar, definimos \texttt{primes} como sendo um anamorfismo de listas (\texttt{anaList}) porque, dado um número, esta função gera uma lista, logo temos aqui um anamorfismo de listas.\\
+Depois temos de descobrir qual será o gene deste anamorfismo. A função \texttt{divByPrime} será o gene deste anamorfismo.
+\begin{spec}
+primes = anaList divByPrime
+\end{spec}
+Esta função, no geral, divide o número dado pelo seu primeiro primo, e dá-nos
+um par com o primeiro primo e o resultado da divisão. Se a função receber o número 1, ela entrega
+
+Uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
+\begin{code}
+primes_ef n = primes2 (2,n)
+
+primes2 = anaList divByPrime2
+
+divByPrime2 (_,1) = i1 ()
+divByPrime2 (d,n) = (i2 . split p2 (split p2 (uncurry div)) . split p2 fst_prime2) (d,n)
+
+fst_prime2 = head . Cp.ap
+        . split (filter . ((==0) .) . mod . p2) (Cp.ap
+        . split (uncurry (.) . ((:) >< flip (++) . singl)) (Cp.ap 
+        . (Cp.ap . split enumFromThenTo (+2) . cond (==2) (+1) (+2) >< floor . sqrt . fromIntegral)))
+\end{code}
+
+Diagrama do anamorfismo:
+\[
+\xymatrix@@C=2cm{
+    |Nat >< Nat| \ar[r]^-{|divByPrime2|} \ar[d]_-{primes2 = |anaList divByPrime2|}
+  & |1 + Nat >< (Nat >< Nat)| \ar[d]^-{|id + id >< (anaList divByPrime2)|} \\
     |list(Nat)|
   & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
 }
 \]
 
 Segunda parte:
-
 Para resolver o problema 2.2, de gerar uma "árvore dos primos", do tipo \texttt{Exp v o}, dada uma lista de números inteiros positivos, foi desenvolvida a seguinte solução:
 \begin{code}
 prime_tree = Term 1 . untar . map (split primes id)
