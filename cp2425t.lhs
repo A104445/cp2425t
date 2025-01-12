@@ -946,8 +946,6 @@ Diagrama do evaluate:
 }
 \]
 
-Fim
-
 %----------------- Índice remissivo (exige makeindex) -------------------------%
 
 \printindex
