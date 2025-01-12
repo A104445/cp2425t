@@ -565,7 +565,7 @@ que sejam necessárias.
 %format (list (x)) = x "^*"
 
 \subsection*{Problema 1}
-Para resolver o problema 1, do cálculo do H-index de um histograma e da lista de colunas do histograma que para ele contribuem, foi desenvolvida a seguinte solução em Haskell:
+Para resolver o problema 1, do cálculo do H-index de um histograma e da lista de colunas do histograma que para ele contribuem, foi desenvolvida a seguinte solução:
 
 \begin{code}
 hindex = hyloList calc_hindex pop_min
@@ -600,31 +600,74 @@ calc_hindex = either (const (0,[]))
 
 \subsection*{Problema 2}
 Primeira parte:
-\begin{code}
-primes = anaList fst_prime
 
-fst_prime 1 = i1()
-fst_prime n = (i2 . split p2 (uncurry div) 
-     . split id (head . uncurry filter
+Para resolver o problema 2.1, de cálculo dos fatores primos de um número inteiro positivo, foi desenvolvida a seguinte solução:
+\begin{code}
+primes = anaList prime_divide
+
+prime_divide 1 = i1()
+prime_divide n = (i2 . split p2 (uncurry div) . split id fst_prime) n
+
+fst_prime = (head . uncurry filter
      . split (((==0) .) . mod) (conc
-     . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))) n
+     . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))
 \end{code}
+
+Diagrama do anamorfismo:
 \[
 \xymatrix@@C=2cm{
-    |Nat| \ar[r]^-{|fst_prime|} \ar[d]_-{primes = |anaList fst_prime|}
-  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList fst_prime)|} \\
+    |Nat| \ar[r]^-{|prime_divide|} \ar[d]_-{primes = |anaList prime_divide|}
+  & |1 + Nat >< Nat| \ar[d]^-{|id + id >< (anaList prime_divide)|} \\
     |list(Nat)|
   & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
 }
 \]
 
 Segunda parte:
+
+Para resolver o problema 2.2, de gerar uma "árvore dos primos", do tipo \texttt{Exp v o}, dada uma lista de números inteiros positivos, foi desenvolvida a seguinte solução:
 \begin{code}
 prime_tree = Term 1 . untar . map (split primes id)
 \end{code}
+Em primeiro lugar, percebemos que teriamos de primeiramente calcular os fatores primos de cada número da lista e que teriamos de manter os números da lista, porque na árvore tanto
+temos os fatores primos de cada número, como temos os próprios números da lista inicial (como podemos observar na árvore dada como exemplo). Assim, a função que queremos tem de começar
+por calcular, para todos os números da lista (função \texttt{map}), um par de valores apartir do número (função \texttt{split} ou <,>): o primeiro elemento do par é os seus fatores primos
+(função \texttt{primes}) e o segundo elemento é o próprio número (função \texttt{id}). Assim, em \texttt{prime\_tree} começamos com a seguinte função:
+\begin{spec}
+map (split primes id)
+\end{spec}
+Em segundo lugar, percebemos que qualquer árvore de primos terá o número 1, como sendo a raiz da árvore, tal como no exemplo que nos foi dado. Nem todos os números inteiros positivos têm
+fatores primos em comum, no entanto, todos os números inteiros positivos têm em comum o facto de serem divisíveis por 1, têm em comum o fator 1. O número 1 é um fator universal, pois divide
+qualquer número inteiro positivo, sempre resultando em quociente inteiro e resto 0. Por isso, faz sentido, na árvore de primos, o número 1 ser a raiz da árvore, o ponto de partida. No entanto,
+sabemos que o número 1 não é primo, então este não será nenhum fator primo obtido na função anterior. Então, o 1 terá de ser inserido na árvore. Como a árvore é do tipo \texttt{Exp v o}, para o número
+1 ser a raiz da árvore, a árvore terá de ser \texttt{Term 1 o}, sendo \texttt{o} a lista de "subárvores", ou seja, \texttt{[Exp v o]}. Assim, em \texttt{prime\_tree} terminamos com a seguinte função:
+\begin{spec}
+Term 1
+\end{spec}
+Em terceiro lugar, percebemos que teríamos de usar uma função que organizasse os números e os seus fatores primos, que já obtemos, numa lista de subárvores (\texttt{[Exp v o]}) para podermos depois
+obter a tal árvore de primos desejada, com a raiz igual ao número 1. Ou seja, precisamos de uma função cuja entrada seja a saída da função \texttt{map <primes,id>}, ou seja, uma lista de pares,
+cujo o primeiro elemento é uma lista de inteiros (os fatores primos) e o segundo é um inteiro (o número), ou seja, do tipo \texttt{[([o],v)]}, e cuja saída seja a entrada da função \texttt{Term 1},
+ou seja, do tipo \texttt{[Exp v o]} (a lista de subárvores). No fundo, queremos primeiro aplicar a função \texttt{map <primes,id>} depois aplicar a tal função desejada e por fim, aplicar a função
+\texttt{Term 1}. O tipo da função desejada será então \texttt{[([o], v)] -> [Exp v o]}.
+\begin{spec}
+Term 1 . ? . map (split primes id)
 
+? :: [([o], v)] -> [Exp v o]
+\end{spec}
+Como a saída da função que queremos é do tipo \texttt{[Exp v o]}, então decidimos investigar cuidadosamente a biblioteca Exp.hs, biblioteca dedicada ao tipo de dados \texttt{Exp v o}. Rapidamente,
+encontramos a função \texttt{untar}, que tem o mesmo tipo, que a função desejada.
+\begin{spec}
+untar :: (Ord v, Ord o) => [([o], v)] -> [Exp v o]
+\end{spec}
+Testamos a nossa função \texttt{prime\_tree} que usa \texttt{untar} e rapidamente percebemos que fazia aquilo que desejavamos. A função \texttt{untar}, no fundo, reorganiza os números e os seus fatores primos,
+que se encontravam num formato \texttt{[([o], v)]}, no formato \texttt{[Exp v o]}, respeitando uma certa ordem (\texttt{(Ord v, Ord o)}). Afinal, como conseguimos ver na árvore dada como exemplo, na árvore
+os fatores primos de um número vão aparecendo na árvore por ordem crescente até chegarmos ao número, que é uma folha. Com esta função conseguimos construir a função \texttt{prime\_tree}:
+\begin{spec}
+prime_tree = Term 1 . untar . map (split primes id)
+\end{spec}
+Assim, conseguimos resolver o problema 2.2 escrevendo o mínimo de código possível (1 linha). Isto foi conseguido porque reutilizámos uma função da biblioteca Exp.hs, a função \texttt{untar}, que nos poupou muito trabalho.
 \subsection*{Problema 3}
-Para resolver o problema 3, do cálculo da convolução de duas listas a e b, foi desenvolvida a seguinte solução em Haskell:
+Para resolver o problema 3, do cálculo da convolução de duas listas a e b, foi desenvolvida a seguinte solução:
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
@@ -634,7 +677,7 @@ convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry
 pad :: Num a => ([a], Int) -> [a]
 pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
 
-generateWindows :: Num a => ([a], Int) -> Either () ([a], [a])
+generateWindows :: Num a => (Int,[a]) -> Either (Int,[a]) ([a], [a])
 generateWindows = cond (uncurry (>) . (id >< length)) (const i1()) (i2 . split (uncurry take) (tail . p2))
 
 combineWindows :: Num a => ([a], Either () ([a], [a])) -> [a]
@@ -654,37 +697,59 @@ combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum .
 \noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista.
 
 \subsection*{Problema 4}
-Definição do tipo:
+Para resolver o problema 4.1, tivemos de definir \texttt{outExpr}, \texttt{recExpr}, \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr}.\\\\
+Definição do tipo:\\\\
+Em primeiro lugar, definimos \texttt{outExpr}. Se \texttt{inExpr} converte um valor do tipo \texttt{Either a (Either b (Op, [Expr b a]))} para um valor do tipo \texttt{Expr b a},
+então \texttt{outExpr} irá fazer o oposto, ou seja, \texttt{outExpr} converte um valor do tipo \texttt{Expr b a} para um valor do tipo \texttt{Either a (Either b (Op, [Expr b a]))}:
 \begin{code}
 outExpr(V a) = i1 a
 outExpr(N b) = (i2 . i1) b
 outExpr(T op l) = (i2 . i2) (op,l)
-
+\end{code}
+Em segundo lugar, definimos \texttt{recExpr}. A função \texttt{recExpr f} é o mesmo que \texttt{F f}, para o tipo de dados \texttt{Expr b a}. \texttt{F f = id + (id + id >< map f)} que é equivalente a:
+\begin{code}
 recExpr = baseExpr id id
 \end{code}
-\emph{Ana + cata + hylo}:
+\emph{Ana + cata + hylo}:\\\\
+Em terceiro lugar, definimos \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr} e ainda fizemos um diagrama.
 \begin{code}
-cataExpr g = g . (recExpr (cataExpr g)) . outExpr
+cataExpr h = h . (recExpr (cataExpr h)) . outExpr
 
 anaExpr g = inExpr . (recExpr (anaExpr g)) . g
 
 hyloExpr h g = cataExpr h . anaExpr g
 \end{code}
-\emph{Monad}:
+\[
+\xymatrix@@C=2cm{
+    |c| \ar[r]^-{|g|} \ar[d]_-{|anaExpr g|} \ar@@/_6pc/[dd]_-{|hyloExpr h g|}
+  & |Either a (Either b (Op, [c]))| \ar[d]^-{|recExpr (anaExpr g)|} \\
+    |Expr b a| \ar[d]_-{|cataExpr h|} \ar@@/^/[r]^{|outExpr|}
+  & |Either a (Either b (Op, [Expr b a]))| \ar@@/^/[l]_{\cong}^{|inExpr|} \ar[d]^-{|recExpr (cataExpr h)|} \\
+    |c|
+  & |Either a (Either b (Op, [c]))| \ar[l]^-{|h|}
+}
+\]
+
+\emph{Monad}:\\
+Para resolver o problema 4.2, tivemos de declarar \texttt{Expr b} como instância da classe Monad.
 \begin{code}
 instance Functor (Expr b) where
      fmap f = cataExpr (inExpr . baseExpr f id id)
+
 instance Applicative (Expr b) where
      (<*>) = aap
      pure  = return
+
 instance Monad (Expr b) where
-    --x >>= g = (u . fmap f) x
     return  = V
-    --e >>= g = (cataExpr () . fmap g) e
     (V a) >>= g = g a
     (N b) >>= g = N b
     (T op l) >>= g = T op (map (>>= g) l)
 \end{code}
+Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad. Para o programa compilar,
+tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
+funtores então faz sentido.
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
@@ -693,7 +758,6 @@ let_exp f = (>>= f)
 \end{code}
 Catamorfismo monádico:
 \begin{code}
---mcataExpr = undefined
 mcataExpr g = g .! (d . recExpr (mcataExpr g) . outExpr)
 
 d :: Monad m => Either a (Either b (Op, [m c])) -> m (Either a (Either b (Op, m [c])))
@@ -701,26 +765,45 @@ d = either (return.i1) (either (return.i2.i1) (fmap (i2.i2) . l))
 
 l :: Monad m => (Op, [m c]) -> m (Op, m [c])
 l (op, t) = do
-    -- Transformar `t :: [m c]` em `m [c]` usando `sequence`
-    mcs <- sequence t  -- mcs :: m [c]
+    mcs <- sequence t
     return (op, return mcs)
-
 \end{code}
+
+\[
+\xymatrix@@C=2cm{
+    |Expr b a| \ar[dd]_-{|mcataExpr g|} \ar@@/^/[r]^-{|outExpr|}
+  & |Either a (Either b (Op, [Expr b a]))| \ar[d]^-{|recExpr (mcataExpr g)|} \\
+    | |
+  & |Either a (Either b (Op, [m c]))| \ar[d]^-{|d|} \\
+    |m c|
+  & |m (Either a (Either b (Op, m [c])))| \ar[l]^-{|(>>= g)|}
+}
+\]
+
 Avaliação de expressões:
 \begin{code}
-evaluate = mcataExpr (inMaybe . fu)
+evaluate = mcataExpr (inMaybe . evalExpr)
 
-fu :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Either () a
-fu = either (const (i1())) (either (i2) (uncurry evalOp))
+evalExpr :: (Num a, Ord a) => Either b (Either a (Op, Maybe [a])) -> Either () a
+evalExpr = either (const (i1())) (either (i2) (uncurry evalOp))
 
 evalOp :: (Num a, Ord a) => Op -> Maybe [a] -> Either () a
 evalOp Suc (Just [x]) = i2(x + 1)
 evalOp Add (Just [x, y]) = i2(x + y)
 evalOp Mul (Just [x, y]) = i2(x * y)
 evalOp ITE (Just [x, y, z]) = if x /= 0 then i2(y) else i2(z)
-evalOp _ _        = i1()  -- Qualquer outro caso falha
-
+evalOp _ _        = i1()
 \end{code}
+\[
+\xymatrix@@C=2cm{
+    |Expr b a| \ar[dd]_-{|evaluate = mcataExpr (inMaybe . evalExpr)|} \ar@@/^/[r]^-{|outExpr|}
+  & |Either a (Either b (Op, [Expr b a]))| \ar[d]^-{|recExpr (mcataExpr (inMaybe . evalExpr))|} \\
+    | |
+  & |Either a (Either b (Op, [Maybe c]))| \ar[d]^-{|d|} \\
+    |Maybe c|
+  & |Maybe (Either a (Either b (Op, Maybe [c])))| \ar[l]^-{|(>>= (inMaybe . evalExpr))|}
+}
+\]
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
 
