@@ -747,8 +747,8 @@ Para resolver o problema 3, do cálculo da convolução de duas listas a e b, fo
 
 \begin{code}
 convolve :: Num a => [a] -> [a] -> [a]
-convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry generateWindows . p2)) 
-                ) (pad . p2)) .) . (curry (split (reverse . p2) (id >< length)))
+convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry generateWindows . p2)) ) (pad . p2)) .)
+          . (curry (split (reverse . p2) (id >< length)))
 
 pad :: Num a => ([a], Int) -> [a]
 pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
@@ -760,17 +760,26 @@ combineWindows :: Num a => ([a], Either () ([a], [a])) -> [a]
 combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum . (zipWith (*) ys) . p1) p2)) >< id)
 \end{code}
 
-\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados, mais especificamente aqui irá gerar janelas) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado, mais especificamente aqui irá combinar janelas dando origem a um resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo e ainda tivemos de desenvolver outras funções auxiliares:
-
+\noindent A função \texttt{convolve} implementa a convolução discreta de duas listas, utilizando um hilomorfismo (\texttt{hyloList}) para gerar e combinar janelas de valores. Um hilomorfismo, como sabemos, é uma composição de um anamorfismo (que gera uma estrutura de dados, mais especificamente aqui irá gerar janelas) com um catamorfismo (que consome uma estrutura de dados, reduzindo-a a um único resultado, mais especificamente aqui irá combinar janelas dando origem a um resultado). Assim, para construir o hilomorfismo, tivemos de descobrir as funções que são os genes do anamorfismo e do catamorfismo e ainda tivemos de desenvolver outras funções
+auxiliares. Antes de entrarmos no hilomorfismo, obtemos a primeira lista (\texttt{id}) e o comprimento da segunda lista (\texttt{length}).
+Depois obtemos também a segunda lista revertida (como se fazia no vídeo) (\texttt{(reverse . p2)}). Depois vamos usar a primeira lista e comprimento da segunda lista, já obtidos, para preparar
+uma lista adequada para ajudar a gerar e combinar janelas (a lista que irá ser usada no hilomorfismo). Depois associamos o comprimento da segunda lista ao anamorfismo e associamos a segunda lista revertida ao
+catamorfismo.
 \begin{itemize}
-    \item \texttt{pad}: Uma função que adiciona zeros no final e no início da lista. Recebe um par onde o primeiro elemento é a primeira lista e o segundo é o comprimento da segunda lista. A função replica zeros e concatena-os à lista original.
+    \item \texttt{pad}: Uma função que adiciona o número adequado de zeros no final e no início da lista. Recebe um par onde o primeiro elemento é a primeira lista e o segundo é o comprimento da segunda lista.
+    Apartir do par dado (\texttt{><}), mantém o primeiro elemento, mantém a primeira lista (\texttt{id}) e pega no segundo elemento, comprimento da segunda lista, retira-lhe um valor (\texttt{subtract 1}) e depois
+    (\texttt{.}) replica o 0 esse número de vezes (\texttt{`replicate` 0}), ou seja, forma uma lista com esse número de 0s. Apartir do par (\texttt{split ou <,>}), mantém a lista de zeros (\texttt{p2}) e concatena
+    a primeira lista com a mesma lista de zeros (\texttt{conc}). Depois (\texttt{.}), pega no par que resta e concatena a lista de zeros com a lista anteriormente obtida (a lista que contém a primeira
+    lista e zeros no final). E assim, obtemos uma lista com zeros no início e final da lista e que no meio tem a primeira lista original. Esta lista será usada no hilomorfismo.
+    A função replica zeros e concatena-os à lista original.
 
-    \item \texttt{generateWindows}: Esta função é o gene do anamorfismo que irá gerar as janelas. Esta função gera uma janela de valores da lista original. Para evitar casos inválidos, verifica se o comprimento da janela excede o comprimento da lista. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par envolvido em \texttt{i2}, contendo a janela atual gerada e a parte restante da lista.
+    \item \texttt{generateWindows}: Esta função é o gene do anamorfismo que irá gerar as janelas. Esta função gera uma janela de valores da "lista com zeros". Para evitar casos inválidos, verifica se o comprimento da segunda lista original excede o comprimento da janela atual. Se for o caso, devolve \texttt{i1()}, representando que não há mais janelas. Caso contrário, devolve um par envolvido em \texttt{i2}, contendo a nova janela gerada
+    (que geramos pegando nos primeiros x elementos da lista com zeros, sendo x o comprimento da segunda lista original) e a parte restante da "lista com zeros" sem a cabeça (\texttt{tail}).
 
-    \item \texttt{combineWindows}: Esta função é o gene do catamorfismo que irá combinas as janelas. Esta função combina uma janelas gerada com os valores da segunda lista, aplicando a operação de convolução. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
+    \item \texttt{combineWindows}: Esta função é o gene do catamorfismo que irá combinar as janelas, que no fundo irá aplicar a convolução. Esta função combina uma janela gerada com os valores da segunda lista revertida. Para cada janela, calcula o produto escalar entre a janela e os valores correspondentes da segunda lista revertida, somando os resultados. Se não houver janelas (\texttt{Left}), devolve uma lista vazia.
 \end{itemize}
 
-\noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista.
+\noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista revertida.
 
 \subsection*{Problema 4}
 Para resolver o problema 4.1, tivemos de definir \texttt{outExpr}, \texttt{recExpr}, \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr}.\\\\
@@ -823,11 +832,11 @@ instance Monad (Expr b) where
     (T op l) >>= g = T op (map (>>= g) l)
 \end{code}
 Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
-Para definir a monad tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} é a unidade e com o \texttt{(>>=)} podemos implementar a multiplicação, \texttt{mu}.
+Para declarar \texttt{Expr b} como instância da classe Monad, em Haskell, tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} em Haskell é a unidade. Com o \texttt{(>>=)} do Haskell podemos implementar a multiplicação, \texttt{mu}, como fizemos em baixo.
 Para o programa compilar,
-tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
-funtores então faz sentido.
-Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative.
+tivemos de declarar ainda \texttt{Expr b} como instância das classes Applicative e Functor. Todas as monades são primeiro
+funtores então faz sentido termos de declarar \texttt{Expr b} como instância de Functor. Para isso, tivemos de implementar a função \texttt{fmap}.
+Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative e foi isso que fizemos.
 \begin{code}
 mu :: Monad m => m (m b) -> m b
 mu x = x >>= id
@@ -835,11 +844,13 @@ mu x = x >>= id
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
-Para resolver o problema 4.4, usamos o (>>=) anteriormente definido:
+
+Para resolver o problema 4.4, usamos a função \texttt{(>>=)} anteriormente definida:
 \begin{code}
 let_exp f = (>>= f)
 \end{code}
 Catamorfismo monádico:
+
 Para resolver o problema 4.3, de definir o catamorfismo monádico deste tipo de dados, desenvolvemos a seguinte solução:
 \begin{code}
 mcataExpr g = g .! (d . recExpr (mcataExpr g) . outExpr)
@@ -865,6 +876,7 @@ l (op, t) = do
 \]
 
 Avaliação de expressões:
+
 Para resolver o problema 4.5, usamos o catamorfismo monádico definido anteriormente:
 \begin{code}
 evaluate = mcataExpr (inMaybe . evalExpr)
