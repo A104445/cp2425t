@@ -845,10 +845,52 @@ Depois temos de descobrir qual será o gene deste anamorfismo. A função \textt
 \>[B]{}\Varid{primes}\mathrel{=}\anaList{\Varid{divByPrime}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Esta função, no geral, divide o número dado pelo seu primeiro primo, e dá-nos
-um par com o primeiro primo e o resultado da divisão. Se a função receber o número 1, ela entrega
+Se a função receber o número 1, ela entrega \texttt{()} encapsulado em \texttt{i1}.
+Se a função receber outro número inteiro positivo, para além de 1, a função, apartir do número, calcula um par de valores (\texttt{split ou <,>}), sendo o primeiro valor o próprio número (\texttt{id})
+e sendo o segundo valor o menor fator primo do número (\texttt{fst\_prime}), o "primeiro" fator primo daquele número. Logo a seguir, apartir do par de valores obtido anteriormente (composição -\texttt{(.)}),
+calcula outro par de valores  (\texttt{split ou <,>}), sendo o primeiro valor, o segundo valor do par anterior (\texttt{p2}), ou seja, o menor fator primo do número original e sendo o segundo valor 
+a divisão inteira do par anterior (\texttt{uncurry div}). Apartir deste par de valores que obtivemos (composição -\texttt{(.)}), encapsulamos o par em \texttt{i2}.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{divByPrime}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\Varid{divByPrime}\;\Varid{n}\mathrel{=}(i_2\comp \conj{\p2}{\uncurry{\cdot \div \cdot }}\comp \conj{\Varid{id}}{\Varid{fst\char95 prime}})\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Por fim, apenas nos falta definir o \texttt{fst\_prime} usado na função anterior. Como já disse, ele calcula o menor fator primo do número dado. A primeira implementação do \texttt{fst\_prime} foi a seguinte:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{primes1}\mathrel{=}\anaList{\Varid{divByPrime1}}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{divByPrime1}\;\mathrm{1}\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\Varid{divByPrime1}\;\Varid{n}\mathrel{=}(i_2\comp \conj{\p2}{\uncurry{\cdot \div \cdot }}\comp \conj{\Varid{id}}{\Varid{fst\char95 prime1}})\;\Varid{n}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{fst\char95 prime1}\mathrel{=}\Varid{head}\comp \uncurry{\Varid{filter}}\comp \conj{((\equiv \mathrm{0})\comp )\comp \Varid{mod}}{\Varid{enumFromTo}\;\mathrm{2}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Aqui, apenas filtramos (\texttt{filter}) desde o número 2 (menor número primo) até ao nosso número (\texttt{enumFromTo 2}), aqueles que dividem o número inteiramente com resto 0 (\texttt{((==0) .) . mod}),
+e pegamos apenas no primeiro que cumpra este requisito - o menor fator primo.\\
 
-Uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
+No entanto, apesar de simples, sabemos que esta solução é pouco eficiente, então decidimos implementar outra:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fst\char95 prime}\mathrel{=}(\Varid{head}\comp \uncurry{\Varid{filter}}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\comp \conj{((\equiv \mathrm{0})\comp )\comp \Varid{mod}}{\mathsf{conc}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\comp \conj{(\mathrm{2}\mathbin{:})\comp \Varid{enumFromThenTo}\;\mathrm{3}\;\mathrm{5}\comp \Varid{floor}\comp \Varid{sqrt}\comp \Varid{fromIntegral}}{\Varid{singl}}}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Nesta versão,
+
+Por fim, decidimos ainda desenvolver uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{9}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1066,11 +1108,18 @@ Para resolver o problema 4.2, tivemos de declarar \texttt{Expr b} como instânci
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}(\Conid{T}\;\Varid{op}\;\Varid{l})\bind \Varid{g}\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\bind \Varid{g})\;\Varid{l}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{mu}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{m}\;(\Varid{m}\;\Varid{b})\to \Varid{m}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{mu}\;\Varid{x}\mathrel{=}\Varid{x}\bind \Varid{id}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad. Para o programa compilar,
+Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
+Para definir a monad tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} é a unidade e com o \texttt{(>>=)} podemos implementar a multiplicação, \texttt{mu}.
+Para o programa compilar,
 tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
 funtores então faz sentido.
+Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative.
 
 \emph{Maps}:
 \emph{Monad}:

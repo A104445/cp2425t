@@ -630,10 +630,36 @@ Depois temos de descobrir qual será o gene deste anamorfismo. A função \textt
 \begin{spec}
 primes = anaList divByPrime
 \end{spec}
-Esta função, no geral, divide o número dado pelo seu primeiro primo, e dá-nos
-um par com o primeiro primo e o resultado da divisão. Se a função receber o número 1, ela entrega
+Se a função receber o número 1, ela entrega \texttt{()} encapsulado em \texttt{i1}.
+Se a função receber outro número inteiro positivo, para além de 1, a função, apartir do número, calcula um par de valores (\texttt{split ou <,>}), sendo o primeiro valor o próprio número (\texttt{id})
+e sendo o segundo valor o menor fator primo do número (\texttt{fst\_prime}), o "primeiro" fator primo daquele número. Logo a seguir, apartir do par de valores obtido anteriormente (composição -\texttt{(.)}),
+calcula outro par de valores  (\texttt{split ou <,>}), sendo o primeiro valor, o segundo valor do par anterior (\texttt{p2}), ou seja, o menor fator primo do número original e sendo o segundo valor 
+a divisão inteira do par anterior (\texttt{uncurry div}). Apartir deste par de valores que obtivemos (composição -\texttt{(.)}), encapsulamos o par em \texttt{i2}.
+\begin{spec}
+divByPrime 1 = i1()
+divByPrime n = (i2 . split p2 (uncurry div) . split id fst_prime) n
+\end{spec}
+Por fim, apenas nos falta definir o \texttt{fst\_prime} usado na função anterior. Como já disse, ele calcula o menor fator primo do número dado. A primeira implementação do \texttt{fst\_prime} foi a seguinte:
+\begin{code}
+primes1 = anaList divByPrime1
 
-Uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
+divByPrime1 1 = i1()
+divByPrime1 n = (i2 . split p2 (uncurry div) . split id fst_prime1) n
+
+fst_prime1 = head . uncurry filter . split (((==0) .) . mod) (enumFromTo 2)
+\end{code}
+Aqui, apenas filtramos (\texttt{filter}) desde o número 2 (menor número primo) até ao nosso número (\texttt{enumFromTo 2}), aqueles que dividem o número inteiramente com resto 0 (\texttt{((==0) .) . mod}),
+e pegamos apenas no primeiro que cumpra este requisito - o menor fator primo.\\
+
+No entanto, apesar de simples, sabemos que esta solução é pouco eficiente, então decidimos implementar outra:
+\begin{spec}
+fst_prime = (head . uncurry filter
+     . split (((==0) .) . mod) (conc
+     . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))
+\end{spec}
+Nesta versão,
+
+Por fim, decidimos ainda desenvolver uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
 \begin{code}
 primes_ef n = primes2 (2,n)
 
@@ -779,10 +805,16 @@ instance Monad (Expr b) where
     (V a) >>= g = g a
     (N b) >>= g = N b
     (T op l) >>= g = T op (map (>>= g) l)
+
+mu :: Monad m => m (m b) -> m b
+mu x = x >>= id
 \end{code}
-Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad. Para o programa compilar,
+Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
+Para definir a monad tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} é a unidade e com o \texttt{(>>=)} podemos implementar a multiplicação, \texttt{mu}.
+Para o programa compilar,
 tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
 funtores então faz sentido.
+Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative.
 
 \emph{Maps}:
 \emph{Monad}:
