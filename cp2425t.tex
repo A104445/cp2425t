@@ -1051,6 +1051,42 @@ catamorfismo.
 
 \noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista revertida.
 
+Antes de termos a função convolve, tinhamos a função convolve1. Ambas fazem o mesmo, mas a convolve1 é bem mais fácil de entender devido a ter variáveis. Por isso, mostramos agora a função convolve1, equivalente à função convolve,
+mas com variáveis:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{convolve1}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{convolve1}\;\Varid{xs}\;\Varid{ys}\mathrel{=}\Varid{hyloList}\;\overline{\Varid{combineWindows}}\;\Varid{r}\;\overline{\Varid{generateWindows}}\;\Varid{l}\;(\Varid{pad}\;(\Varid{xs},\Varid{l})){}\<[E]%
+\\
+\>[B]{}\hsindent{17}{}\<[17]%
+\>[17]{}\mathbf{where}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{l}\mathrel{=}\length \;\Varid{ys}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{r}\mathrel{=}\Varid{reverse}\;\Varid{ys}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Diagrama do hilomorfismo presente em convolve1:
+
+\[
+\xymatrix@C=2cm{
+    \ensuremath{\R ^*} \ar[r]^-{\ensuremath{\overline{\Varid{generateWindows}}\;\Varid{l}}} \ar[d]_-{\ensuremath{\anaList{\overline{\Varid{generateWindows}}\;\Varid{l}}}} \ar@/_6pc/[dd]_-{\ensuremath{\llbracket\, \overline{\Varid{combineWindows}}\;\Varid{r},\,\overline{\Varid{generateWindows}}\;\Varid{l}\,\rrbracket}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\R ^*\times\R ^*} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\overline{\Varid{generateWindows}}\;\Varid{l}}}} \\
+    \ensuremath{(\R ^*)^*} \ar[d]_-{\ensuremath{\llparenthesis\, \overline{\Varid{combineWindows}}\;\Varid{r}\,\rrparenthesis}} \ar@/^/[r]^{\ensuremath{\Varid{out}\mathbin{*}}}
+  & \ensuremath{\mathrm{1}\mathbin{+}\R ^*\times(\R ^*)^*} \ar@/^/[l]_{\cong}^{\ensuremath{\mathsf{in}\mathbin{*}}} \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\llparenthesis\, \overline{\Varid{combineWindows}}\;\Varid{r}\,\rrparenthesis}} \\
+    \ensuremath{\R ^*}
+  & \ensuremath{\mathrm{1}\mathbin{+}\R ^*\times\R ^*} \ar[l]^-{\ensuremath{\overline{\Varid{combineWindows}}\;\Varid{r}}}
+}
+\]
+
 \subsection*{Problema 4}
 Para resolver o problema 4.1, tivemos de definir \texttt{outExpr}, \texttt{recExpr}, \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr}.\\\\
 Definição do tipo:\\\\

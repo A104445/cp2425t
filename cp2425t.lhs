@@ -561,6 +561,7 @@ que sejam necessárias.
 
 \noindent
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
+%format Reais = "\R "
 %format Nat = "\N "
 %format (list (x)) = x "^*"
 
@@ -780,6 +781,30 @@ catamorfismo.
 \end{itemize}
 
 \noindent A função \texttt{convolve} aplica estas operações para calcular a convolução discreta, gerando uma nova lista onde cada elemento é o resultado da combinação das janelas com os valores da segunda lista revertida.
+
+Antes de termos a função convolve, tinhamos a função convolve1. Ambas fazem o mesmo, mas a convolve1 é bem mais fácil de entender devido a ter variáveis. Por isso, mostramos agora a função convolve1, equivalente à função convolve,
+mas com variáveis:
+
+\begin{code}
+convolve1 :: Num a => [a] -> [a] -> [a]
+convolve1 xs ys = hyloList (curry combineWindows r) (curry generateWindows l) (pad (xs,l))
+                where 
+                  l = length ys
+                  r = reverse ys
+\end{code}
+
+Diagrama do hilomorfismo presente em convolve1:
+
+\[
+\xymatrix@@C=2cm{
+    |list(Reais)| \ar[r]^-{|curry (generateWindows) l|} \ar[d]_-{|anaList (curry (generateWindows) l)|} \ar@@/_6pc/[dd]_-{|hylo (curry (combineWindows) r) (curry (generateWindows) l)|}
+  & |1 + list(Reais) >< list(Reais)| \ar[d]^-{|id + id >< anaList (curry (generateWindows) l)|} \\
+    |list((list(Reais)))| \ar[d]_-{|cataList (curry (combineWindows) r)|} \ar@@/^/[r]^{|out*|}
+  & |1 + list(Reais) >< list((list(Reais)))| \ar@@/^/[l]_{\cong}^{|inNat*|} \ar[d]^-{|id + id >< cataList (curry (combineWindows) r)|} \\
+    |list(Reais)|
+  & |1 + list(Reais) >< list(Reais)| \ar[l]^-{|curry (combineWindows) r|}
+}
+\]
 
 \subsection*{Problema 4}
 Para resolver o problema 4.1, tivemos de definir \texttt{outExpr}, \texttt{recExpr}, \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr}.\\\\
