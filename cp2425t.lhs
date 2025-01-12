@@ -649,7 +649,7 @@ divByPrime1 n = (i2 . split p2 (uncurry div) . split id fst_prime1) n
 fst_prime1 = head . uncurry filter . split (((==0) .) . mod) (enumFromTo 2)
 \end{code}
 Aqui, apenas filtramos (\texttt{filter}) desde o número 2 (menor número primo) até ao nosso número (\texttt{enumFromTo 2}), aqueles que dividem o número inteiramente com resto 0 (\texttt{((==0) .) . mod}),
-e pegamos apenas no primeiro que cumpra este requisito - o menor fator primo.\\
+e pegamos apenas no primeiro que cumpra este requisito (\texttt{head}) - o menor fator primo.\\
 
 No entanto, apesar de simples, sabemos que esta solução é pouco eficiente, então decidimos implementar outra:
 \begin{spec}
@@ -657,8 +657,13 @@ fst_prime = (head . uncurry filter
      . split (((==0) .) . mod) (conc
      . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))
 \end{spec}
-Nesta versão,
-
+Nesta versão, a única diferença é a lista de onde iremos filtrar os números. Desta vez, obtemos uma lista menor, logo o cálculo para encontrar o menor fator primo será mais rápido, porque iremos filtrar
+de uma lista menor. Esta função, para além de mais eficiente, continua correta. É eficiente porque obtemos os números 2 e o próprio número e os números impares de 3 até à raiz quadrada do nosso número,
+bem menos números do que anteriormente. Metade dos números que percorriamos (os números pares maiores que 2) agora não percorremos, porque sabemos que 2 é o único número par e primo, logo ao procurar fatores
+primos não vale a pena percorrer os outros números pares. Para além disso, já não percorremos os números da raiz quadrada do número até ao número (mas percorremos o número ainda), porque sabemos que para
+calcular os fatores primos de um número, basta procurar divisores primos até a raiz quadrada desse número (e também ver o próprio número). Isso ocorre porque, se o número tem um divisor maior que a sua raiz
+quadrada, então obrigatoriamente deve existir outro divisor menor que a raiz quadrada. Assim, ao percorrer apenas até a raiz quadrada, já encontramos todos os fatores primos (menos se o número for primo). Se
+até aqui não encontramos nenhum fator primo, é porque o número é primo, então no final da lista pomos o próprio número.\\
 Por fim, decidimos ainda desenvolver uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
 \begin{code}
 primes_ef n = primes2 (2,n)
@@ -666,7 +671,7 @@ primes_ef n = primes2 (2,n)
 primes2 = anaList divByPrime2
 
 divByPrime2 (_,1) = i1 ()
-divByPrime2 (d,n) = (i2 . split p2 (split p2 (uncurry div)) . split p2 fst_prime2) (d,n)
+divByPrime2 (p,n) = (i2 . split p2 (split p2 (uncurry div)) . split p2 fst_prime2) (p,n)
 
 fst_prime2 = head . Cp.ap
         . split (filter . ((==0) .) . mod . p2) (Cp.ap
@@ -683,6 +688,14 @@ Diagrama do anamorfismo:
   & |1 + Nat >< list(Nat)| \ar[l]^-{|inNat*|}
 }
 \]
+Nesta versão, guardamos o menor fator primo da iteração anterior, para não tentarmos testar números que já deviamos saber que não são fatores primos deste número. Por exemplo, se anteriormente calculei que
+o menor fator primo de 45 é 3, na próxima iteração, saberei que o menor fator primo de 15 (3*15 = 45) é maior ou igual a 3. Já sei que não será o 2 porque senão teria sido o menor fator de 45 (nós pegamos
+nos fatores primos por ordem crescente). Assim, diminuimos a lista de procura de fatores primos e o programa fica mais eficiente.\\\\
+Podemos perceber o quão mais eficiente esta função é da anterior, calculando os fatores primos de 99999971³. Usando \texttt{primes}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo -
+99999971. Depois voltará a percorrer [2,3,5,7,...99999971], etc...\\\\
+Usando \texttt{primes\_ef}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo - 99999971. Depois irá percorrer [99999971] porque já sabe que os números menores que 99999971 não
+são fatores primos do número inicial. Claramente percebemos que a lista percorrida vai diminuir drasticamente em alguns casos, e assim, \texttt{primes\_ef} é bem mais eficiente que \texttt{primes} em alguns casos. Noutros casos
+\texttt{primes} e \texttt{primes\_ef} são igualmente eficientes (por exemplo, para calcular os fatores primos de 99999971, já vimos que percorrem a mesma lista).\\
 
 Segunda parte:
 Para resolver o problema 2.2, de gerar uma "árvore dos primos", do tipo \texttt{Exp v o}, dada uma lista de números inteiros positivos, foi desenvolvida a seguinte solução:
@@ -805,9 +818,6 @@ instance Monad (Expr b) where
     (V a) >>= g = g a
     (N b) >>= g = N b
     (T op l) >>= g = T op (map (>>= g) l)
-
-mu :: Monad m => m (m b) -> m b
-mu x = x >>= id
 \end{code}
 Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
 Para definir a monad tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} é a unidade e com o \texttt{(>>=)} podemos implementar a multiplicação, \texttt{mu}.
@@ -815,14 +825,19 @@ Para o programa compilar,
 tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
 funtores então faz sentido.
 Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative.
-
+\begin{code}
+mu :: Monad m => m (m b) -> m b
+mu x = x >>= id
+\end{code}
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
+Para resolver o problema 4.4, usamos o (>>=) anteriormente definido:
 \begin{code}
 let_exp f = (>>= f)
 \end{code}
 Catamorfismo monádico:
+Para resolver o problema 4.3, de definir o catamorfismo monádico deste tipo de dados, desenvolvemos a seguinte solução:
 \begin{code}
 mcataExpr g = g .! (d . recExpr (mcataExpr g) . outExpr)
 
@@ -847,6 +862,7 @@ l (op, t) = do
 \]
 
 Avaliação de expressões:
+Para resolver o problema 4.5, usamos o catamorfismo monádico definido anteriormente:
 \begin{code}
 evaluate = mcataExpr (inMaybe . evalExpr)
 

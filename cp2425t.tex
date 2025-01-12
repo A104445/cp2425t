@@ -872,7 +872,7 @@ Por fim, apenas nos falta definir o \texttt{fst\_prime} usado na função anteri
 \ColumnHook
 \end{hscode}\resethooks
 Aqui, apenas filtramos (\texttt{filter}) desde o número 2 (menor número primo) até ao nosso número (\texttt{enumFromTo 2}), aqueles que dividem o número inteiramente com resto 0 (\texttt{((==0) .) . mod}),
-e pegamos apenas no primeiro que cumpra este requisito - o menor fator primo.\\
+e pegamos apenas no primeiro que cumpra este requisito (\texttt{head}) - o menor fator primo.\\
 
 No entanto, apesar de simples, sabemos que esta solução é pouco eficiente, então decidimos implementar outra:
 \begin{hscode}\SaveRestoreHook
@@ -888,8 +888,13 @@ No entanto, apesar de simples, sabemos que esta solução é pouco eficiente, en
 \>[6]{}\comp \conj{(\mathrm{2}\mathbin{:})\comp \Varid{enumFromThenTo}\;\mathrm{3}\;\mathrm{5}\comp \Varid{floor}\comp \Varid{sqrt}\comp \Varid{fromIntegral}}{\Varid{singl}}}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Nesta versão,
-
+Nesta versão, a única diferença é a lista de onde iremos filtrar os números. Desta vez, obtemos uma lista menor, logo o cálculo para encontrar o menor fator primo será mais rápido, porque iremos filtrar
+de uma lista menor. Esta função, para além de mais eficiente, continua correta. É eficiente porque obtemos os números 2 e o próprio número e os números impares de 3 até à raiz quadrada do nosso número,
+bem menos números do que anteriormente. Metade dos números que percorriamos (os números pares maiores que 2) agora não percorremos, porque sabemos que 2 é o único número par e primo, logo ao procurar fatores
+primos não vale a pena percorrer os outros números pares. Para além disso, já não percorremos os números da raiz quadrada do número até ao número (mas percorremos o número ainda), porque sabemos que para
+calcular os fatores primos de um número, basta procurar divisores primos até a raiz quadrada desse número (e também ver o próprio número). Isso ocorre porque, se o número tem um divisor maior que a sua raiz
+quadrada, então obrigatoriamente deve existir outro divisor menor que a raiz quadrada. Assim, ao percorrer apenas até a raiz quadrada, já encontramos todos os fatores primos (menos se o número for primo). Se
+até aqui não encontramos nenhum fator primo, é porque o número é primo, então no final da lista pomos o próprio número.\\
 Por fim, decidimos ainda desenvolver uma versão que calcula os fatores primos mais eficientemente, em alguns casos:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -901,7 +906,7 @@ Por fim, decidimos ainda desenvolver uma versão que calcula os fatores primos m
 \\[\blanklineskip]%
 \>[B]{}\Varid{divByPrime2}\;(\anonymous ,\mathrm{1})\mathrel{=}i_1\;(){}\<[E]%
 \\
-\>[B]{}\Varid{divByPrime2}\;(\Varid{d},\Varid{n})\mathrel{=}(i_2\comp \conj{\p2}{\conj{\p2}{\uncurry{\cdot \div \cdot }}}\comp \conj{\p2}{\Varid{fst\char95 prime2}})\;(\Varid{d},\Varid{n}){}\<[E]%
+\>[B]{}\Varid{divByPrime2}\;(\Varid{p},\Varid{n})\mathrel{=}(i_2\comp \conj{\p2}{\conj{\p2}{\uncurry{\cdot \div \cdot }}}\comp \conj{\p2}{\Varid{fst\char95 prime2}})\;(\Varid{p},\Varid{n}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{fst\char95 prime2}\mathrel{=}\Varid{head}\comp \Varid{\Conid{Cp}.ap}{}\<[E]%
 \\
@@ -925,6 +930,14 @@ Diagrama do anamorfismo:
   & \ensuremath{\mathrm{1}\mathbin{+}\N \times\N ^*} \ar[l]^-{\ensuremath{\mathsf{in}\mathbin{*}}}
 }
 \]
+Nesta versão, guardamos o menor fator primo da iteração anterior, para não tentarmos testar números que já deviamos saber que não são fatores primos deste número. Por exemplo, se anteriormente calculei que
+o menor fator primo de 45 é 3, na próxima iteração, saberei que o menor fator primo de 15 (3*15 = 45) é maior ou igual a 3. Já sei que não será o 2 porque senão teria sido o menor fator de 45 (nós pegamos
+nos fatores primos por ordem crescente). Assim, diminuimos a lista de procura de fatores primos e o programa fica mais eficiente.\\\\
+Podemos perceber o quão mais eficiente esta função é da anterior, calculando os fatores primos de 99999971³. Usando \texttt{primes}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo -
+99999971. Depois voltará a percorrer [2,3,5,7,...99999971], etc...\\\\
+Usando \texttt{primes\_ef}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo - 99999971. Depois irá percorrer [99999971] porque já sabe que os números menores que 99999971 não
+são fatores primos do número inicial. Claramente percebemos que a lista percorrida vai diminuir drasticamente em alguns casos, e assim, \texttt{primes\_ef} é bem mais eficiente que \texttt{primes} em alguns casos. Noutros casos
+\texttt{primes} e \texttt{primes\_ef} são igualmente eficientes (por exemplo, para calcular os fatores primos de 99999971, já vimos que percorrem a mesma lista).\\
 
 Segunda parte:
 Para resolver o problema 2.2, de gerar uma "árvore dos primos", do tipo \texttt{Exp v o}, dada uma lista de números inteiros positivos, foi desenvolvida a seguinte solução:
@@ -1108,10 +1121,6 @@ Para resolver o problema 4.2, tivemos de declarar \texttt{Expr b} como instânci
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}(\Conid{T}\;\Varid{op}\;\Varid{l})\bind \Varid{g}\mathrel{=}\Conid{T}\;\Varid{op}\;(\map \;(\bind \Varid{g})\;\Varid{l}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{mu}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{m}\;(\Varid{m}\;\Varid{b})\to \Varid{m}\;\Varid{b}{}\<[E]%
-\\
-\>[B]{}\Varid{mu}\;\Varid{x}\mathrel{=}\Varid{x}\bind \Varid{id}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
@@ -1120,10 +1129,18 @@ Para o programa compilar,
 tivemos de declarar ainda \texttt{Expr b} como Applicative e como Functor. Todas as monades são primeiro
 funtores então faz sentido.
 Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative.
-
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{mu}\mathbin{::}\Conid{Monad}\;\Varid{m}\Rightarrow \Varid{m}\;(\Varid{m}\;\Varid{b})\to \Varid{m}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{mu}\;\Varid{x}\mathrel{=}\Varid{x}\bind \Varid{id}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
+Para resolver o problema 4.4, usamos o (>>=) anteriormente definido:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1131,6 +1148,7 @@ Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora
 \ColumnHook
 \end{hscode}\resethooks
 Catamorfismo monádico:
+Para resolver o problema 4.3, de definir o catamorfismo monádico deste tipo de dados, desenvolvemos a seguinte solução:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1165,6 +1183,7 @@ Catamorfismo monádico:
 \]
 
 Avaliação de expressões:
+Para resolver o problema 4.5, usamos o catamorfismo monádico definido anteriormente:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{19}{@{}>{\hspre}l<{\hspost}@{}}%
