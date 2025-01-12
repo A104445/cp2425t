@@ -857,23 +857,39 @@ instance Monad (Expr b) where
     (T op l) >>= g = T op (map (>>= g) l)
 \end{code}
 Em primeiro lugar, declaramos \texttt{Expr b} como instância da classe Monad.
-Para declarar \texttt{Expr b} como instância da classe Monad, em Haskell, tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} em Haskell é a unidade. Com o \texttt{(>>=)} do Haskell podemos implementar a multiplicação, \texttt{mu}, como fizemos em baixo.
-Para o programa compilar,
-tivemos de declarar ainda \texttt{Expr b} como instância das classes Applicative e Functor. Todas as monades são primeiro
-funtores então faz sentido termos de declarar \texttt{Expr b} como instância de Functor. Para isso, tivemos de implementar a função \texttt{fmap}.
-Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative e foi isso que fizemos.
+Para declarar \texttt{Expr b} como instância da classe Monad, em Haskell, tivemos de implementar as funções \texttt{return} e \texttt{(>>=)}. O \texttt{return} em Haskell é a unidade. Com o \texttt{(>>=)} do Haskell podemos implementar a multiplicação, \texttt{mu},
+como fizemos em baixo. Nós colocamos \texttt{return = V} porque \texttt{return} insere um valor no contexto monádico, e como \texttt{V} representa uma variável genérica em Expr, ele é o construtor apropriado para encapsular valores manipuláveis.
+Depois implementamos \texttt{(>>=)}. Para uma variável \texttt{(V a)}, o operador \texttt{>>=} aplica a função \texttt{g} ao valor encapsulado, retornando o resultado da transformação.
+Para um número \texttt{N b}, como números não devem ser modificados, o valor é retornado inalterado.
+Para uma operação \texttt{T op l}, \texttt{>>=} aplica recursivamente a função \texttt{g} a cada subexpressão na lista l, mantendo a estrutura da operação.
 \begin{code}
 mu :: Monad m => m (m b) -> m b
 mu x = x >>= id
 \end{code}
+Para o programa compilar,
+tivemos de declarar ainda \texttt{Expr b} como instância das classes Applicative e Functor. Todas as monades são primeiro
+funtores então faz sentido termos de declarar \texttt{Expr b} como instância de Functor. Para isso, tivemos de implementar a função \texttt{fmap}.
+
+\[
+\xymatrix@@C=2cm{
+    |Expr b a| \ar[d]_-{|fmap f = cataExpr (inExpr . baseExpr f id id)|} \ar@@/^/[r]^{|outExpr|}
+  & |Either a (Either b (Op, [Expr b a]))| \ar@@/^/[l]_{\cong}^{|inExpr|} \ar[d]^-{|recExpr (fmap f)|} \\
+    |Expr b a|
+  & |Either a (Either b (Op, [Expr b a]))| \ar[l]^-{|inExpr . baseExpr f id id|}
+}
+\]
+
+Desde a introdução do "Applicative Monad Proposal" (AMP), a classe Monad agora exige que a classe Applicative seja implementada antes. Isso significa que também precisamos implementar pure e <*>, que vêm da classe Applicative e foi isso que fizemos.
+
 \emph{Maps}:
 \emph{Monad}:
 \emph{Let expressions}:
 
-Para resolver o problema 4.4, usamos a função \texttt{(>>=)} anteriormente definida:
+Para resolver o problema 4.4, usamos a função \texttt{(>>=)} anteriormente definida.
 \begin{code}
 let_exp f = (>>= f)
 \end{code}
+A função \texttt{let\_exp} aplica a função \texttt{f} a cada variável de uma expressão, substituindo-a pela expressão correspondente fornecida por \texttt{f}. Usando o operador \texttt{>>=}, a função substitui as variáveis dentro da expressão, garantindo que todas as variáveis sejam instanciadas antes de a expressão poder ser avaliada.\\\\
 Catamorfismo monádico:
 
 Para resolver o problema 4.3, de definir o catamorfismo monádico deste tipo de dados, desenvolvemos a seguinte solução:
