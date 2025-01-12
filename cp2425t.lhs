@@ -932,8 +932,8 @@ evalOp Mul (Just [x, y]) = i2(x * y)
 evalOp ITE (Just [x, y, z]) = if x /= 0 then i2(y) else i2(z)
 evalOp _ _        = i1()
 \end{code}
-A função \texttt{evalExpr} retorna \texttt{i1()} se receber uma variável ou uma operação sem sentido e retorna o valor capsulado em \texttt{i2}, se receber um número ou uma operação válida.
-A função \texttt{evalOp} é uma função auxiliar de \texttt{evalExpr}, que avalia operações.\\
+A função \texttt{evalExpr} retorna \texttt{i1()} se receber uma variável ou uma operação sem sentido e retorna o valor encapsulado em \texttt{i2}, se receber um número ou uma operação válida.
+A função \texttt{evalOp} é uma função auxiliar de \texttt{evalExpr}, que avalia operações.\\\\
 Diagrama do evaluate:
 \[
 \xymatrix@@C=2cm{
