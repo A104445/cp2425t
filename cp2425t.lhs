@@ -700,6 +700,7 @@ são os fatores primos que faltam do número inicial. Claramente percebemos que 
 \texttt{primes} e \texttt{primes\_ef} são igualmente eficientes (por exemplo, para calcular os fatores primos de 99999971, já vimos que percorrem a mesma lista).\\
 
 Segunda parte:
+
 Para resolver o problema 2.2, de gerar uma "árvore dos primos", do tipo \texttt{Exp v o}, dada uma lista de números inteiros positivos, foi desenvolvida a seguinte solução:
 \begin{code}
 prime_tree = Term 1 . untar . map (split primes id)
@@ -786,7 +787,7 @@ Em segundo lugar, definimos \texttt{recExpr}. A função \texttt{recExpr f} é o
 recExpr = baseExpr id id
 \end{code}
 \emph{Ana + cata + hylo}:\\\\
-Em terceiro lugar, definimos \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr} e ainda fizemos um diagrama.
+Em terceiro lugar, definimos \texttt{cataExpr}, \texttt{anaExpr} e \texttt{hyloExpr} e ainda fizemos um diagrama ilustrativo.
 \begin{code}
 cataExpr h = h . (recExpr (cataExpr h)) . outExpr
 
