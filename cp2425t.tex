@@ -1275,6 +1275,9 @@ Para resolver o problema 4.5, usamos o catamorfismo monádico definido anteriorm
 \>[19]{}\mathrel{=}i_1\;(){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+A função \texttt{evalExpr} retorna \texttt{i1()} se receber uma variável ou uma operação sem sentido e retorna o valor capsulado em \texttt{i2}, se receber um número ou uma operação válida.
+A função \texttt{evalOp} é uma função auxiliar de \texttt{evalExpr}, que avalia operações.\\
+Diagrama do evaluate:
 \[
 \xymatrix@C=2cm{
     \ensuremath{\Conid{Expr}\;\Varid{b}\;\Varid{a}} \ar[dd]_-{\ensuremath{\Varid{evaluate}\mathrel{=}\Varid{mcataExpr}\;(\Varid{inMaybe}\comp \Varid{evalExpr})}} \ar@/^/[r]^-{\ensuremath{\Varid{outExpr}}}
@@ -1285,6 +1288,8 @@ Para resolver o problema 4.5, usamos o catamorfismo monádico definido anteriorm
   & \ensuremath{\Conid{Maybe}\;(\Varid{a}+(\Varid{b}+(\Conid{Op},\Conid{Maybe}\;[\mskip1.5mu \Varid{c}\mskip1.5mu])))} \ar[l]^-{\ensuremath{(\bind (\Varid{inMaybe}\comp \Varid{evalExpr}))}}
 }
 \]
+
+Fim
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
 
