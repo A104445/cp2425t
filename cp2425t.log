@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.5)  12 JAN 2025 15:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.5)  12 JAN 2025 16:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1437,23 +1437,20 @@ t line 788.
  (/usr/share/texlive/texmf-dist/tex/latex/paratype/TS1PTSerif-TLF.fd
 File: TS1PTSerif-TLF.fd 2014/02/02 Font definitions for TS1/PTSerif-TLF.
 )
-<xymatrix 2x3
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 80
-3.
- (/usr/share/texmf/tex/latex/lm/t1lmr.fd
-File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) 444>
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
 [8{/usr/share/texlive/texmf-dist/fonts/enc/dvips/paratype/ptserif_ts1.enc}]
+<xymatrix 2x3
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 80
+5.
+ (/usr/share/texmf/tex/latex/lm/t1lmr.fd
+File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) 444>
 \openout7 = `cp2425t.ptb'.
 
-
-<xymatrix 2x2 194>
-\openout7 = `cp2425t.ptb'.
-
+ <xymatrix 2x2 194>
 \openout7 = `cp2425t.ptb'.
 
 \openout7 = `cp2425t.ptb'.
@@ -1464,7 +1461,10 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  []
 
 [9{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}]
-Underfull \hbox (badness 10000) in paragraph at lines 873--876
+\openout7 = `cp2425t.ptb'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 875--878
 
  []
 
@@ -1473,41 +1473,37 @@ Underfull \hbox (badness 10000) in paragraph at lines 873--876
 \openout7 = `cp2425t.ptb'.
 
 <xymatrix 2x2 194>
-LaTeX Font Info:    Trying to load font information for TS1+PTSans-TLF on input
- line 936.
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
 
-(/usr/share/texlive/texmf-dist/tex/latex/paratype/TS1PTSans-TLF.fd
+[10]
+LaTeX Font Info:    Trying to load font information for TS1+PTSans-TLF on input
+ line 938.
+ (/usr/share/texlive/texmf-dist/tex/latex/paratype/TS1PTSans-TLF.fd
 File: TS1PTSans-TLF.fd 2011/05/04 (autoinst with patch) Font definitions for TS
 1/PTSans-TLF.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 932--941
+Underfull \hbox (badness 10000) in paragraph at lines 934--943
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 932--941
+Underfull \hbox (badness 10000) in paragraph at lines 934--943
 
  []
 
 
-Underfull \hbox (badness 1953) in paragraph at lines 932--941
+Underfull \hbox (badness 1953) in paragraph at lines 934--943
 \T1/PTSans-TLF/m/n/10.95 Usando \T1/PTMono-TLF/m/n/10.95 primes_ef\T1/PTSans-TL
 F/m/n/10.95 , primeiro ela vai per-cor-rer a lista [2,3,5,7,...99999971] até en
 -con-trar o
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 932--941
+Underfull \hbox (badness 10000) in paragraph at lines 934--943
 
  []
-
-
-Overfull \hbox (128.0374pt too wide) has occurred while \output is active
- [][]| 
- []
-
-[10]
-\openout7 = `cp2425t.ptb'.
 
 \openout7 = `cp2425t.ptb'.
 
@@ -1527,23 +1523,25 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2425t.ptb'.
 
+\openout7 = `cp2425t.ptb'.
+
 
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
 [12]
-Underfull \hbox (badness 10000) in paragraph at lines 1043--1047
+Underfull \hbox (badness 10000) in paragraph at lines 1045--1049
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1043--1047
+Underfull \hbox (badness 10000) in paragraph at lines 1045--1049
 
  []
 
 
-Underfull \hbox (badness 1168) in paragraph at lines 1043--1047
+Underfull \hbox (badness 1168) in paragraph at lines 1045--1049
 \T1/PTSans-TLF/m/n/10.95 Em primeiro lu-gar, defin-i-mos \T1/PTMono-TLF/m/n/10.
 95 ou-t-Expr\T1/PTSans-TLF/m/n/10.95 . Se \T1/PTMono-TLF/m/n/10.95 in-Expr \T1/
 PTSans-TLF/m/n/10.95 con-verte um valor do tipo \T1/PTMono-TLF/m/n/10.95 Ei-the
@@ -1555,16 +1553,13 @@ r a
 \openout7 = `cp2425t.ptb'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1063--1066
+Underfull \hbox (badness 10000) in paragraph at lines 1065--1068
 
  []
 
 \openout7 = `cp2425t.ptb'.
 
 <xymatrix 2x3 444>
-\openout7 = `cp2425t.ptb'.
-
-
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
@@ -1576,16 +1571,18 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2425t.ptb'.
 
- <xymatrix 2x3 253>
 \openout7 = `cp2425t.ptb'.
 
-
+ <xymatrix 2x3 253>
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[14] <xymatrix 2x3 253>
-Overfull \hbox (25.48601pt too wide) detected at line 1220
+[14]
+\openout7 = `cp2425t.ptb'.
+
+ <xymatrix 2x3 253>
+Overfull \hbox (25.48601pt too wide) detected at line 1222
  $[]$ 
  []
 
@@ -1611,11 +1608,11 @@ Package rerunfilecheck Info: File `cp2425t.out' has not changed.
 Here is how much of TeX's memory you used:
  47826 strings out of 476106
  1047020 string characters out of 5793934
- 1946975 words of memory out of 5000000
+ 1948975 words of memory out of 5000000
  69121 multiletter control sequences out of 15000+600000
  792552 words of font info for 151 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 99i,19n,101p,3281b,866s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,19n,101p,3281b,864s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF55F.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/paratype/ptserif/PTF56F.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/paratype/ptserif/PTF75F.pfb></usr/share/texlive/te
@@ -1635,7 +1632,7 @@ hare/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/sh
 are/texlive/texmf-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texl
 ive/texmf-dist/fonts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/public/xypic/xybtip10.pfb>
-Output written on cp2425t.pdf (16 pages, 757586 bytes).
+Output written on cp2425t.pdf (16 pages, 757952 bytes).
 PDF statistics:
  310 PDF objects out of 1000 (max. 8388607)
  235 compressed objects within 3 object streams

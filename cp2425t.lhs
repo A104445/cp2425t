@@ -585,10 +585,12 @@ calc_hindex = either (const (0,[]))
     \item \texttt{pop\_min}: Esta função é o gene do anamorfismo que irá gerar uma estrutura de dados apartir do histograma.
     Este anamorfismo irá, mais concretamente, apartir do histograma, gerar uma lista ordenada por ordem crescente.
     Esta função calcula o mínimo de uma lista e a lista sem esse mínimo. Para uma lista vazia, devolve \texttt{i1()}, que corresponde a \texttt{Left ()}, encapsulando o valor da unidade \texttt{()} no lado esquerdo de um tipo \texttt{Either}. Para uma lista não vazia, a função identifica o valor mínimo da lista, remove a primeira ocorrência desse mínimo da lista e prepara o resultado num par, onde o primeiro elemento é o valor mínimo e o segundo é a lista com o mínimo removido. O resultado é então envolvido com \texttt{i2}, que é um sinónimo de \texttt{Right}, o lado direito de um tipo \texttt{Either}. 
-    Com este gene, o anamorfismo vai pegando no mínimo da lista e juntando a nova lista, o que irá gerar uma lista ordenada por ordem crescente. Este anamorfismo é o selection sort.
-    \item \texttt{calc\_hindex}: Esta função é o gene do catamorfismo que irá processar (consumir) a estrutura gerada pelo anamorfismo para calcular o H-index e determinar os elementos que contribuem para o resultado. Para um valor do tipo \texttt{Left} (\texttt{i2}), devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right} (\texttt{i1}), avalia se o primeiro elemento do par é maior ou igual ao sucessor do primeiro elemento do segundo par. Se a condição for verdadeira, incrementa o contador (H-index) e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas o H-index anterior e a lista de contribuições anteriormente acumuladas.
+    Com este gene, o anamorfismo vai pegando no mínimo da lista e juntando à nova lista, o que irá gerar uma lista ordenada por ordem crescente. Este anamorfismo é o selection sort.
+    \item \texttt{calc\_hindex}: Esta função é o gene do catamorfismo que irá processar (consumir) a estrutura gerada pelo anamorfismo para calcular o H-index e determinar os elementos que contribuem para o resultado. O catamorfismo irá, mais concretamente, consumir a lista ordenada pelo anamorfismo, para obter o resultado que pretendemos. No gene, para um valor do tipo \texttt{Left} (\texttt{i1}), devolve diretamente o par \texttt{(0, [])}, representando que o H-index é zero e não há elementos processados. Para um valor do tipo \texttt{Right} (\texttt{i2}), avalia se o primeiro elemento do par (um valor da lista ordenada) é maior ou igual ao sucessor do primeiro elemento do segundo elemento do par (o H-index acumulado até ao momento). Se a condição for verdadeira, incrementa o contador (H-index) e adiciona o elemento atual à lista de contribuições. Caso contrário, devolve apenas o H-index anterior e a lista de contribuições anteriormente acumuladas.
+    Com este gene, o catamorfismo vai calculando o H-index e a lista que o justifica, iteração a iteração, para cada "sub-histograma", até por fim, calcular o H-index de todo o histograma e a lista que o justifica, aquilo que queriamos.
 \end{itemize}
 
+Diagrama do hilomorfismo:
 \[
 \xymatrix@@C=2cm{
     |list(Nat)| \ar[r]^-{|pop_min|} \ar[d]_-{|anaList pop_min|} \ar@@/_6pc/[dd]_-{|hindex = hylo calc_hindex pop_min|}
@@ -632,9 +634,9 @@ primes = anaList divByPrime
 \end{spec}
 Se a função receber o número 1, ela entrega \texttt{()} encapsulado em \texttt{i1}.
 Se a função receber outro número inteiro positivo, para além de 1, a função, apartir do número, calcula um par de valores (\texttt{split ou <,>}), sendo o primeiro valor o próprio número (\texttt{id})
-e sendo o segundo valor o menor fator primo do número (\texttt{fst\_prime}), o "primeiro" fator primo daquele número. Logo a seguir, apartir do par de valores obtido anteriormente (composição -\texttt{(.)}),
+e sendo o segundo valor o menor fator primo do número (\texttt{fst\_prime}), o "primeiro" fator primo daquele número. Logo a seguir, apartir do par de valores obtido anteriormente (composição - \texttt{(.)}),
 calcula outro par de valores  (\texttt{split ou <,>}), sendo o primeiro valor, o segundo valor do par anterior (\texttt{p2}), ou seja, o menor fator primo do número original e sendo o segundo valor 
-a divisão inteira do par anterior (\texttt{uncurry div}). Apartir deste par de valores que obtivemos (composição -\texttt{(.)}), encapsulamos o par em \texttt{i2}.
+a divisão inteira do par anterior (\texttt{uncurry div}), ou seja, a divisão do número original pelo seu menor fator primo. Apartir deste par de valores que obtivemos (composição - \texttt{(.)}), encapsulamos o par em \texttt{i2}.
 \begin{spec}
 divByPrime 1 = i1()
 divByPrime n = (i2 . split p2 (uncurry div) . split id fst_prime) n
@@ -658,7 +660,7 @@ fst_prime = (head . uncurry filter
      . split ((2:) . enumFromThenTo 3 5 . floor . sqrt . fromIntegral) singl))
 \end{spec}
 Nesta versão, a única diferença é a lista de onde iremos filtrar os números. Desta vez, obtemos uma lista menor, logo o cálculo para encontrar o menor fator primo será mais rápido, porque iremos filtrar
-de uma lista menor. Esta função, para além de mais eficiente, continua correta. É eficiente porque obtemos os números 2 e o próprio número e os números impares de 3 até à raiz quadrada do nosso número,
+de uma lista menor. Esta função, para além de mais eficiente, continua correta. É eficiente porque obtemos os números 2, o próprio número e os números impares de 3 até à raiz quadrada do nosso número,
 bem menos números do que anteriormente. Metade dos números que percorriamos (os números pares maiores que 2) agora não percorremos, porque sabemos que 2 é o único número par e primo, logo ao procurar fatores
 primos não vale a pena percorrer os outros números pares. Para além disso, já não percorremos os números da raiz quadrada do número até ao número (mas percorremos o número ainda), porque sabemos que para
 calcular os fatores primos de um número, basta procurar divisores primos até a raiz quadrada desse número (e também ver o próprio número). Isso ocorre porque, se o número tem um divisor maior que a sua raiz
@@ -694,7 +696,7 @@ nos fatores primos por ordem crescente). Assim, diminuimos a lista de procura de
 Podemos perceber o quão mais eficiente esta função é da anterior, calculando os fatores primos de 99999971³. Usando \texttt{primes}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo -
 99999971. Depois voltará a percorrer [2,3,5,7,...99999971], etc...\\\\
 Usando \texttt{primes\_ef}, primeiro ela vai percorrer a lista [2,3,5,7,...99999971] até encontrar o primeiro primo - 99999971. Depois irá percorrer [99999971] porque já sabe que os números menores que 99999971 não
-são fatores primos do número inicial. Claramente percebemos que a lista percorrida vai diminuir drasticamente em alguns casos, e assim, \texttt{primes\_ef} é bem mais eficiente que \texttt{primes} em alguns casos. Noutros casos
+são os fatores primos que faltam do número inicial. Claramente percebemos que a lista percorrida vai diminuir drasticamente em alguns casos, e assim, \texttt{primes\_ef} é bem mais eficiente que \texttt{primes} em alguns casos. Noutros casos
 \texttt{primes} e \texttt{primes\_ef} são igualmente eficientes (por exemplo, para calcular os fatores primos de 99999971, já vimos que percorrem a mesma lista).\\
 
 Segunda parte:
