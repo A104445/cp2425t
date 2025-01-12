@@ -1020,9 +1020,9 @@ Para resolver o problema 3, do cálculo da convolução de duas listas a e b, fo
 \\
 \>[B]{}\Varid{pad}\mathrel{=}\mathsf{conc}\comp \conj{\p2}{\mathsf{conc}}\comp (\Varid{id}\times(\mathbin{`\Varid{replicate}`}\mathrm{0})\comp (\Varid{subtract}\;\mathrm{1})){}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{generateWindows}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow (\Conid{Int},[\mskip1.5mu \Varid{a}\mskip1.5mu])\to (\Conid{Int},[\mskip1.5mu \Varid{a}\mskip1.5mu])+([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu]){}\<[E]%
+\>[B]{}\Varid{generateWindows}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow (\Conid{Int},[\mskip1.5mu \Varid{a}\mskip1.5mu])\to ()+([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu]){}\<[E]%
 \\
-\>[B]{}\Varid{generateWindows}\mathrel{=}\Varid{cond}\;(\uncurry{(\mathbin{>})}\comp (\Varid{id}\times\length ))\;\underline{i_1}\;()\;(i_2\comp \conj{\uncurry{\Varid{take}}}{\Varid{tail}\comp \p2}){}\<[E]%
+\>[B]{}\Varid{generateWindows}\mathrel{=}\Varid{cond}\;(\uncurry{(\mathbin{>})}\comp (\Varid{id}\times\length ))\;\underline{i_1\;()}\;(i_2\comp \conj{\uncurry{\Varid{take}}}{\Varid{tail}\comp \p2}){}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{combineWindows}\mathbin{::}\Conid{Num}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],()+([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu]))\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
 \\

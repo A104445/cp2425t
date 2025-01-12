@@ -753,8 +753,8 @@ convolve = ((Cp.ap . split ((uncurry hyloList .) (curry combineWindows >< (curry
 pad :: Num a => ([a], Int) -> [a]
 pad = conc . split p2 conc . (id >< (`replicate` 0). (subtract 1))
 
-generateWindows :: Num a => (Int,[a]) -> Either (Int,[a]) ([a], [a])
-generateWindows = cond (uncurry (>) . (id >< length)) (const i1()) (i2 . split (uncurry take) (tail . p2))
+generateWindows :: Num a => (Int,[a]) -> Either () ([a], [a])
+generateWindows = cond (uncurry (>) . (id >< length)) (const (i1())) (i2 . split (uncurry take) (tail . p2))
 
 combineWindows :: Num a => ([a], Either () ([a], [a])) -> [a]
 combineWindows = Cp.ap . ((\ys -> either (const []) (conc . split (singl . sum . (zipWith (*) ys) . p1) p2)) >< id)
